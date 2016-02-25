@@ -9,10 +9,11 @@ module.exports = function(options){
         out        = options.out,
         modules    = options.modules,
         es6Modules = options.es6Modules;
+        includenodeModules = options.includenodeModules;
     process.chdir(process.env.PWD)
     var pwd = './'
     var config =  {
-      externals: [ nodeExternals() ],
+      externals: [ nodeExternals({ whitelist: includenodeModules }) ],
       plugins: [
 		new webpack.optimize.DedupePlugin(),
 		new webpack.optimize.OccurenceOrderPlugin(),
