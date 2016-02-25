@@ -14,7 +14,7 @@ function optNameChain(){
         var arg = arguments[i]
         if(typeof(arg) == "string"){
             var optIndex = process.argv.indexOf(arg)
-            if(optIndex)
+            if(optIndex > -1)
                 opt = process.argv[optIndex+1]
         } else if(typeof(arg) == "number") {
             opt = process.argv[arg]
@@ -31,6 +31,7 @@ function importantLog(str){
 var options = {
     server: optNameChain("--server", "--entry", "-s", process.argv.length - 2),
     out: optNameChain("--out", "--build", "-o", "-b", process.argv.length - 1),
+    modules: optNameChain("--modules", "--moduleDirectory"),
     task: optNameChain("--task"),
     es6Modules: optNameChain("--es6-modules"),
 }
@@ -52,15 +53,14 @@ function onBuild(done) {
   }
 }
 
-
-gulp.task('dist', function(done) {
-  process.env.NODE_ENV = 'production';
-  webpack(config).run(onBuild(done));
-});
-
 gulp.task('build', function(done) {
   webpack(config).run(onBuild(done));
-});
+})
+
+gulp.task('dist', function(done) {
+  importantLog("distributing an optimized backend from '" + gutil.colors.cyan(options.server) + "' to '" + gutil.colors.cyan(options.out) + "'")
+  webpack(config).run(onBuild(done));
+})
 
 gulp.task('watch', function(done) {
   var firedDone = false;
@@ -91,5 +91,6 @@ gulp.task('default', ['watch'], function() {
 });
 
 if (require.main === module) {
+    console.log(options.task )
     gulp.start(options.task || 'default');
 }

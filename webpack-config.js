@@ -7,6 +7,7 @@ var XRegExp = require('xregexp');
 module.exports = function(options){
     var server     = options.server,
         out        = options.out,
+        modules    = options.modules,
         es6Modules = options.es6Modules;
     process.chdir(process.env.PWD)
     var pwd = './'
@@ -26,7 +27,7 @@ module.exports = function(options){
       },
       context: path.resolve(pwd),
       resolve: {
-        moduleDirectories: ["src", "node_modules"],
+        moduleDirectories: [modules, "src", "node_modules"],
         extensions: ['', '.json', '.js', '.jsx']
       },
       module: {
@@ -47,14 +48,14 @@ module.exports = function(options){
         filename: path.basename(out),
       },
     }
-    if (process.env.NODE_ENV !== 'production'){
+    if (process.env.NODE_ENV !== 'production' && options.task != 'dist'){
       config.devtool = 'source-map'
       config.debug = true
       config.plugins = [
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.HotModuleReplacementPlugin(),
       ]
-      config.externals = [{ whitelist: ["webpack/hot/poll?1000"] }]
+      config.externals = [nodeExternals({ whitelist: ["webpack/hot/poll?1000"] })]
       config.entry = [ "webpack/hot/poll?1000", server ]
     }
     return config
