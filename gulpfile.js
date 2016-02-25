@@ -29,8 +29,9 @@ function importantLog(str){
 
 
 var options = {
-    server: optNameChain("--server", "-s", process.argv.length - 2),
+    server: optNameChain("--server", "--entry", "-s", process.argv.length - 2),
     out: optNameChain("--out", "--build", "-o", "-b", process.argv.length - 1),
+    task: optNameChain("--task"),
     es6Modules: optNameChain("--es6-modules"),
 }
 var config = backendConfig(options)
@@ -52,11 +53,16 @@ function onBuild(done) {
 }
 
 
-gulp.task('backend-build', function(done) {
+gulp.task('dist', function(done) {
+  process.env.NODE_ENV = 'production';
   webpack(config).run(onBuild(done));
 });
 
-gulp.task('backend-watch', function(done) {
+gulp.task('build', function(done) {
+  webpack(config).run(onBuild(done));
+});
+
+gulp.task('watch', function(done) {
   var firedDone = false;
   webpack(config).watch(100, function(err, stats) {
     if(!firedDone) {
@@ -67,10 +73,7 @@ gulp.task('backend-watch', function(done) {
   });
 });
 
-gulp.task('build', ['backend-build']);
-gulp.task('watch', ['backend-watch']);
-
-gulp.task('default', ['backend-watch'], function() {
+gulp.task('default', ['watch'], function() {
   importantLog("serving patchable backend from '" + gutil.colors.cyan(options.server) + "'")
   importantLog("writing output to '" + gutil.colors.cyan(options.out) + "'")
    
@@ -88,5 +91,5 @@ gulp.task('default', ['backend-watch'], function() {
 });
 
 if (require.main === module) {
-    gulp.start('default');
+    gulp.start(options.task || 'default');
 }
