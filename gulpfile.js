@@ -33,9 +33,10 @@ var options = {
     out: optNameChain("--out", "--build", "-o", "-b", process.argv.length - 1),
     modules: optNameChain("--modules", "--moduleDirectory"),
     task: optNameChain("--task"),
-    includeNodeModules: optNameChain("--include-node-modules").split(','),
+    includeNodeModules: optNameChain("--include-node-modules"),
     es6Modules: optNameChain("--es6-modules"),
 }
+options.includeNodeModules = options.includeNodeModules ? options.includeNodeModules.split(',') : []
 var config = backendConfig(options)
 
 // tasks
