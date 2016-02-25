@@ -91,6 +91,5 @@ gulp.task('default', ['watch'], function() {
 });
 
 if (require.main === module) {
-    console.log(options.task )
     gulp.start(options.task || 'default');
 }
