@@ -16,10 +16,9 @@ module.exports = function(options){
       plugins: [
 		new webpack.optimize.DedupePlugin(),
 		new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.optimize.UglifyJsPlugin()
+        //new webpack.optimize.UglifyJsPlugin()
       ],
       target: 'node',
-      debug: true,
       cache:   false,
       node: {
         __dirname: true,
@@ -27,15 +26,15 @@ module.exports = function(options){
       },
       context: path.resolve(pwd),
       resolve: {
-        moduleDirectories: [modules, "src", "node_modules"],
+        moduleDirectories: [modules, "node_modules"],
         extensions: ['', '.json', '.js', '.jsx']
       },
       module: {
         loaders: [
           {
             test: /\.js$/,
-            loaders: [ 'babel-loader?{presets:["es2015","stage-0"]}' ],
-            exclude: XRegExp('/node_modules\/(?!' + es6Modules + ')/'),
+            loaders: [ 'babel?presets[]=stage-0,presets[]=es2015' ],
+            exclude: es6Modules ? XRegExp('/node_modules\/(?!' + es6Modules + ')/') : /node_modules/,
           },
           {
               test: /\.json$/, loader: 'json'
@@ -44,6 +43,7 @@ module.exports = function(options){
       },
       entry: [ server ],
       output: {
+        libraryTarget: "commonjs2",
         path: path.dirname(out),
         filename: path.basename(out),
       },
@@ -57,6 +57,9 @@ module.exports = function(options){
       ]
       config.externals = [nodeExternals({ whitelist: ["webpack/hot/poll?1000"] })]
       config.entry = [ "webpack/hot/poll?1000", server ]
+    }
+    if(options.library){
+        config.output.library = library
     }
     return config
 }
