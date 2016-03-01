@@ -40,36 +40,36 @@ options.includeNodeModules = options.includeNodeModules ? options.includeNodeMod
 var config = backendConfig(options)
 
 // tasks
-function onBuild(done) {
-  return function(err, stats) {
+function onBuild(err, stats) {
     if(err) {
       console.log('Error', err);
     }
-    else {
-      console.log(stats.toString());
+    console.log(stats.toString({colors: true}));
+}
+function onFirstBuild(done) {
+    return function(err,stats){
+        onBuild(err,stats)
+        done()
     }
-
-    if(done) {
-      done();
-    }
-  }
 }
 
 gulp.task('build', function(done) {
-  webpack(config).run(onBuild(done));
+  webpack(config).run(onFirstBuild(done));
 })
 
 gulp.task('dist', function(done) {
   importantLog("distributing an optimized backend from '" + gutil.colors.cyan(options.server) + "' to '" + gutil.colors.cyan(options.out) + "'")
-  webpack(config).run(onBuild(done));
+  webpack(config).run(onFirstBuild(done));
 })
 
 gulp.task('watch', function(done) {
   var firedDone = false;
-  webpack(config).watch(100, function(err, stats) {
+  webpack(config).watch(250, function(err, stats) {
     if(!firedDone) {
       firedDone = true;
-      onBuild(done)(err, stats)
+      onFirstBuild(done)(err, stats)
+    } else {
+      onBuild(err, stats)
     }
     nodemon.restart();
   });

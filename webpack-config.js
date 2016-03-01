@@ -17,7 +17,8 @@ module.exports = function(options){
       plugins: [
 		new webpack.optimize.DedupePlugin(),
 		new webpack.optimize.OccurenceOrderPlugin(),
-        //new webpack.optimize.UglifyJsPlugin()
+        new webpack.optimize.UglifyJsPlugin(),
+		new webpack.NoErrorsPlugin(),
       ],
       target: 'node',
       cache:   false,
@@ -34,12 +35,15 @@ module.exports = function(options){
         loaders: [
           {
             test: /\.js$/,
-            loaders: [ 'babel?presets[]=stage-0,presets[]=es2015' ],
+            loaders: [ 'babel?presets[]=stage-0&presets[]=es2015' ],
             exclude: es6Modules ? XRegExp('/node_modules\/(?!' + es6Modules + ')/') : /node_modules/,
-          },
-          {
-              test: /\.json$/, loader: 'json'
-          }
+            postLoaders: [
+            ],
+            noParse: /\.min\.js/
+        },
+        {
+            test: /\.json$/, loader: 'json'
+        }
         ],
       },
       entry: [ server ],
@@ -53,8 +57,8 @@ module.exports = function(options){
       config.devtool = 'source-map'
       config.debug = true
       config.plugins = [
-        new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.HotModuleReplacementPlugin(),
+		new webpack.NoErrorsPlugin(),
       ]
       config.externals = [nodeExternals({ whitelist: ["webpack/hot/poll?1000"] })]
       config.entry = [ "webpack/hot/poll?1000", server ]
