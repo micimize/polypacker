@@ -35,6 +35,7 @@ var options = {
     task: optNameChain("--task"),
     includeNodeModules: optNameChain("--include-node-modules"),
     es6Modules: optNameChain("--es6-modules"),
+    react: optNameChain("--react")
 }
 options.includeNodeModules = options.includeNodeModules ? options.includeNodeModules.split(',') : []
 var config = backendConfig(options)

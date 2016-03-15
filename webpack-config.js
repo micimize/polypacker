@@ -8,6 +8,7 @@ module.exports = function(options){
     var server     = options.server,
         out        = options.out,
         modules    = options.modules,
+        react    = options.react,
         es6Modules = options.es6Modules;
         includeNodeModules = options.includeNodeModules || [];
     process.chdir(process.env.PWD)
@@ -35,7 +36,7 @@ module.exports = function(options){
         loaders: [
           {
             test: /\.js$/,
-            loaders: [ 'babel?presets[]=stage-0&presets[]=es2015' ],
+            loaders: [ 'babel?presets[]=stage-0&presets[]=es2015' + (react ? '&presets[]=react' : '')],
             exclude: es6Modules ? XRegExp('/node_modules\/(?!' + es6Modules + ')/') : /node_modules/,
             postLoaders: [
             ],
@@ -59,6 +60,10 @@ module.exports = function(options){
       config.plugins = [
         new webpack.HotModuleReplacementPlugin(),
 		new webpack.NoErrorsPlugin(),
+        new webpack.BannerPlugin(
+          'require("source-map-support").install();',
+          { raw: true, entryOnly: false }
+        )
       ]
       config.externals = [nodeExternals({ whitelist: ["webpack/hot/poll?1000"] })]
       config.entry = [ "webpack/hot/poll?1000", server ]
