@@ -1,7 +1,7 @@
 {
-  "name": "node-simple-webpacker",
+  "name": "polypacker",
   "version": "0.0.1",
-  "description": "aims to provide a hot-reloading server-side development and distribution environment",
+  "description": "aims to provide context-driven code optimization and distribution for both multiple environments",
   "main": "./webpack-config",
   "bin": "./gulpfile.js",
   "scripts": {
@@ -9,17 +9,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/michaeljosephrosenthal/node-simple-webpacker.git"
+    "url": "git+https://github.com/michaeljosephrosenthal/polypacker.git"
   },
   "author": "Michael Joseph Rosenthal <rosenthalm93@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/michaeljosephrosenthal/node-simple-webpacker/issues"
+    "url": "https://github.com/michaeljosephrosenthal/polypacker/issues"
   },
-  "homepage": "https://github.com/michaeljosephrosenthal/node-simple-webpacker#readme",
+  "homepage": "https://github.com/michaeljosephrosenthal/polypacker#readme",
   "dependencies": {
     "babel-core": "^6.5.1",
     "babel-loader": "6.2.0",
+    "babel-polyfill": "^6.7.4",
     "babel-preset-es2015": "6.3.13",
     "babel-preset-react": "^6.5.0",
     "babel-preset-stage-0": "6.3.13",
