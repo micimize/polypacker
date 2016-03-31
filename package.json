@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/michaeljosephrosenthal/polypacker#readme",
   "dependencies": {
+    "argparse": "^1.0.7",
     "babel-core": "^6.5.1",
     "babel-loader": "6.2.0",
     "babel-polyfill": "^6.7.4",
