@@ -2,7 +2,7 @@ var ArgumentParser = require('argparse').ArgumentParser
 
 function clone(obj) {
     if (null == obj || "object" != typeof obj) return obj;
-    var copy = obj.constructor();
+    var copy = obj.constructor() || {}
     for (var attr in obj) {
         if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
     }
@@ -30,14 +30,13 @@ function parserFromArgumentMap(argumentMap){
 }
 
 function splitByContext(args){
-    var contextuallyDividedArgs = []
-    for (var context in args.contexts) {
-        contextArgs = clone(args)
+    contexts = args.contexts
+    delete args.contexts
+    return contexts.map(function(context){
+        var contextArgs = clone(args)
         contextArgs.context = context
-        delete contextArgs.contexts
-        contextuallyDividedArgs.push(resolvePresets(contextArgs))
-    }
-    return contextuallyDividedArgs
+        return contextArgs
+    })
 }
 function fromSrcDir(args){
     args.entry = args.entry || './src/index.js'
@@ -48,27 +47,47 @@ function fromSrcDir(args){
 function defaultContextualComponent(args){
     args = fromSrcDir(args)
     args.out = args.out || args.context && './dist/for/' + args.context.toLowerCase() + '.js'
-
     return args
 }
 
+function selectTask(conf){
+    if(conf.watch && conf.run){
+        return 'watch-and-run'
+    } else if(conf.watch){
+        return 'watch'
+    } else if (conf.run) {
+        return 'run'
+    } else {
+        return 'dist'
+    }
+}
+
+function taskWrapper(compilers, task){
+    return {
+        task: task || 'dist', 
+        compilers: compilers
+    }
+}
+
 var presets = {
-    NODE_COMPONENT: function(args){ return [defaultContextualComponent(args)],
-    BROWSER_COMPONENT: function(args){ return [defaultContextualComponent(args)],
+    NODE_COMPONENT: function(args){ return taskWrapper([defaultContextualComponent(args)]) },
+    BROWSER_COMPONENT: function(args){ return taskWrapper([defaultContextualComponent(args)]) },
     FULLSTACK_COMPONENT: function(args){
+        args.contexts = ['NODE', 'BROWSER']
         var contexts = splitByContext(args)
         for (i = 0; i < contexts.length; i++) {
             contexts[i] = defaultContextualComponent(contexts[i])
         }
-        return contexts
+        return taskWrapper(contexts, args.watch ? 'watch' : 'dist')
     },
     FULLSTACK_APPLICATION: function(args){
+        args.contexts = ['NODE', 'BROWSER']
         var contexts = splitByContext(args)
         for (i = 0; i < contexts.length; i++) {
             contexts[i] = defaultContextualComponent(contexts[i])
-            contexts[i] = ( contexts[i].context == 'NODE' )
+            contexts[i].run = ( contexts[i].context == 'NODE' )
         }
-        return contexts
+        return taskWrapper(contexts, args.watch ? 'watch-and-run' : 'run')
     }
 }
 
@@ -94,7 +113,8 @@ var parser = parserFromArgumentMap({
         help: 'where to look for modules'
     },
     watch: {
-        help: 'monitor source files for changes and recompile.'
+        help: 'monitor source files for changes and recompile.',
+        action: 'storeTrue'
     },
     run: {
         help: 'Which context to run on compilation, if any'

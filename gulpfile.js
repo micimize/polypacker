@@ -7,7 +7,7 @@ var path = require('path');
 var fs = require('fs');
 var nodemon = require('nodemon');
 var webpackConfig = require('./webpack-config');
-var configure = require('./configure');
+var configure = require('./argparser');
 
 function importantLog(str){
   gutil.log(gutil.colors.bgMagenta(" ") + " " + gutil.colors.bold(str))
@@ -28,8 +28,10 @@ function onFirstBuild(done) {
     }
 }
 
-var baseConfiguration = configure()
-var configurations = baseConfiguration.map(webpackConfig)
+var wrapper = configure()
+console.log(wrapper.compilers)
+var configurations = wrapper.compilers.map(webpackConfig)
+var selectedTask = wrapper.task
 
 function compileForAllConfigurations(done){
   configurations.map(function(configuration){
@@ -86,18 +88,6 @@ gulp.task('watch', watchAllConfigurations)
 gulp.task('run', ['dist'], runSelectedContext);
 gulp.task('watch-and-run', ['watch'], runSelectedContext);
 
-function selectTask(conf){
-    if(conf.watch && conf.run){
-        return 'watch-and-run'
-    } else if(conf.watch){
-        return 'watch'
-    } else if (conf.run) {
-        return 'run'
-    } else {
-        return 'dist'
-    }
-}
-
 if (require.main === module) {
-    gulp.start(baseConfiguration)
+    gulp.start(selectedTask)
 }

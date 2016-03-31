@@ -4,21 +4,24 @@ var webpack = require('webpack');
 var nodeExternals = require('webpack-node-externals');
 var XRegExp = require('xregexp');
 
+var contextToTarget = {
+    NODE: 'node',
+    BROWSER: 'web'
+}
+
 module.exports = function(options){
-    var server     = options.server,
-        out        = options.out,
-        modules    = options.modules,
-        react    = options.react,
-        es6Modules = options.es6Modules;
-        context = options.context;
-        includeNodeModules = options.includeNodeModules || [];
+    var entry   = options.entry,
+        out     = options.out,
+        modules = options.modules,
+        context = options.context
+        env     = options.env || process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() || 'DEVELOPMENT';
     process.chdir(process.env.PWD)
     var pwd = './'
     var config =  {
       devtool: 'source-map',
-      externals: [ nodeExternals({ whitelist: includeNodeModules }) ],
+      externals: [ nodeExternals() ],
       plugins: [
-		new webpack.DefinePlugin({ $ES: { CONTEXT: JSON.stringify(context) || JSON.stringify('NODE'), ENV: JSON.stringify('PRODUCTION')} }),
+		new webpack.DefinePlugin({ $ES: { CONTEXT: JSON.stringify(context) || JSON.stringify('NODE'), ENV: JSON.stringify(env)} }),
 		new webpack.optimize.DedupePlugin(),
 		new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.BannerPlugin(
@@ -28,8 +31,8 @@ module.exports = function(options){
         new webpack.optimize.UglifyJsPlugin(),
 		new webpack.NoErrorsPlugin(),
       ],
-      target: 'node',
-      cache:   false,
+      target: contextToTarget[context],
+      cache: false,
       node: {
         __dirname: true,
         __filename: true
@@ -43,8 +46,8 @@ module.exports = function(options){
         loaders: [
           {
             test: /\.js|\.jsx$/,
-            loaders: [ 'babel?presets[]=es2015' + (react ? '&presets[]=react' : '') + '&presets[]=stage-0'],
-            exclude: es6Modules ? XRegExp('/node_modules\/(?!' + es6Modules + ')/') : /node_modules/,
+            loaders: [ 'babel?presets[]=es2015&presets[]=react&presets[]=stage-0'],
+            exclude: /node_modules/,
             postLoaders: [
             ],
             noParse: /\.min\.js/
@@ -71,14 +74,14 @@ module.exports = function(options){
           } 
         ],
       },
-      entry: [ server ],
+      entry: [ entry ],
       output: {
         libraryTarget: "commonjs2",
         path: path.dirname(out),
         filename: path.basename(out),
       },
     }
-    if (process.env.NODE_ENV !== 'production' && options.task != 'dist'){
+    if (env !== 'PRODUCTION'){
       config.devtool = 'source-map'
       config.debug = true
       config.plugins = [
@@ -91,7 +94,7 @@ module.exports = function(options){
         )
       ]
       config.externals = [nodeExternals({ whitelist: ["webpack/hot/poll?1000"] })]
-      config.entry = [ "webpack/hot/poll?1000", server ]
+      config.entry = [ "webpack/hot/poll?1000", entry ]
     }
     if(options.library){
         config.output.library = library
