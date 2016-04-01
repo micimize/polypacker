@@ -1,3 +1,4 @@
+var fs = require('fs')
 var ArgumentParser = require('argparse').ArgumentParser
 
 function clone(obj) {
@@ -68,17 +69,34 @@ function taskWrapper(compilers, task){
         compilers: compilers
     }
 }
-
+function handleIndexTemplate(){
+    try {
+        fs.lstatSync('./dist/index.js')
+    } catch(err){
+        fs.mkdir('./dist')
+        fs.createReadStream(__dirname + '/templates/fullstackComponentIndex.js')
+            .pipe(fs.createWriteStream('./dist/index.js'))
+    }
+}
 var presets = {
     NODE_COMPONENT: function(args){ return taskWrapper([defaultContextualComponent(args)]) },
     BROWSER_COMPONENT: function(args){ return taskWrapper([defaultContextualComponent(args)]) },
     FULLSTACK_COMPONENT: function(args){
+        handleIndexTemplate() // TODO: this and splitByContext don't handle args.out like they should
         args.contexts = ['NODE', 'BROWSER']
         var contexts = splitByContext(args)
         for (i = 0; i < contexts.length; i++) {
             contexts[i] = defaultContextualComponent(contexts[i])
         }
         return taskWrapper(contexts, args.watch ? 'watch' : 'dist')
+    },
+    NODE_APPLICATION: function(args){
+        args.context = 'NODE'
+        delete args.contexts
+        args.out = args.out || './dist/index.js'
+        args.run = true
+        args = defaultContextualComponent(args)
+        return taskWrapper([args], args.watch ? 'watch-and-run' : 'run')
     },
     FULLSTACK_APPLICATION: function(args){
         args.contexts = ['NODE', 'BROWSER']
@@ -98,7 +116,7 @@ function applyPreset(args){
     if (preset && presets[preset]) {
         return presets[preset](args)
     } else {
-        return args
+        return taskWrapper([args], selectTask(args))
     }
 }
 
@@ -119,6 +137,9 @@ var parser = parserFromArgumentMap({
     run: {
         help: 'Which context to run on compilation, if any'
     },
+    env: {
+        help: 'application lifecycle environment. This should probably be deployment or something'
+    },
     context: {
         aliases: ['-c'],
         dest: 'contexts',
@@ -132,6 +153,11 @@ var parser = parserFromArgumentMap({
             contexts: [NODE, BROWSER]\
             out: ./dist/for/$context.js\
         }. Presets are actually functions that take in the given user args, and thus can have fairly intricate logic.',
+    },
+    babelPreset: {
+        dest: 'babelPresets',
+        help: 'add a preset to the babel loader, between es2015 and stage-0',
+        action: 'append'
     },
 })
 

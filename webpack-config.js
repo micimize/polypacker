@@ -13,15 +13,23 @@ module.exports = function(options){
     var entry   = options.entry,
         out     = options.out,
         modules = options.modules,
-        context = options.context
+        babelPresets = options.babelPresets || [],
+        context = options.context,
         env     = options.env || process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() || 'DEVELOPMENT';
     process.chdir(process.env.PWD)
+    babelPresets.unshift('es2015')
+    babelPresets.push('stage-0')
     var pwd = './'
     var config =  {
       devtool: 'source-map',
       externals: [ nodeExternals() ],
       plugins: [
-		new webpack.DefinePlugin({ $ES: { CONTEXT: JSON.stringify(context) || JSON.stringify('NODE'), ENV: JSON.stringify(env)} }),
+		new webpack.DefinePlugin({
+          $ES: {
+              CONTEXT: JSON.stringify(context) || JSON.stringify('NODE'),
+              ENV: JSON.stringify(env)
+          }
+        }),
 		new webpack.optimize.DedupePlugin(),
 		new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.BannerPlugin(
@@ -46,7 +54,10 @@ module.exports = function(options){
         loaders: [
           {
             test: /\.js|\.jsx$/,
-            loaders: [ 'babel?presets[]=es2015&presets[]=react&presets[]=stage-0'],
+            loader: 'babel',
+            query: {
+                presets: babelPresets
+            },
             exclude: /node_modules/,
             postLoaders: [
             ],

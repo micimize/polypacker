@@ -13,7 +13,6 @@ function importantLog(str){
   gutil.log(gutil.colors.bgMagenta(" ") + " " + gutil.colors.bold(str))
 }
 
-
 // tasks
 function onBuild(err, stats) {
     if(err) {
@@ -29,14 +28,21 @@ function onFirstBuild(done) {
 }
 
 var wrapper = configure()
-console.log(wrapper.compilers)
-var configurations = wrapper.compilers.map(webpackConfig)
+var configurations = wrapper.compilers
 var selectedTask = wrapper.task
 
 function compileForAllConfigurations(done){
+  var firedDone = false
   configurations.map(function(configuration){
       importantLog("distributing from '" + gutil.colors.cyan(configuration.entry) + "' to '" + gutil.colors.cyan(configuration.out) + "'")
-      webpack(configuration).run(onFirstBuild(done));
+      webpack(webpackConfig(configuration)).run(function(err,stats){
+          if(!firedDone) {
+              firedDone = true
+              onFirstBuild(done)(err, stats)
+          } else {
+              onBuild(err, stats)
+          }
+      })
   })
 }
 
@@ -50,7 +56,7 @@ var contextWatchActions = {
 function watchAllConfigurations(done){
   var firedDone = false;
   configurations.map(function(configuration){
-      webpack(configuration).watch(250, function(err, stats) {
+      webpack(webpackConfig(configuration)).watch(250, function(err, stats) {
           if(!firedDone) {
               firedDone = true;
               onFirstBuild(done)(err, stats)
@@ -83,7 +89,7 @@ function runSelectedContext(){
   })
 }
 
-gulp.task('dist',  compileForAllConfigurations)
+gulp.task('dist', compileForAllConfigurations)
 gulp.task('watch', watchAllConfigurations)
 gulp.task('run', ['dist'], runSelectedContext);
 gulp.task('watch-and-run', ['watch'], runSelectedContext);
