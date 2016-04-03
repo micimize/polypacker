@@ -74,6 +74,7 @@ function watchAllConfigurations(done){
 function runSelectedContext(){
   configurations.map(function(configuration){
       if(configuration.run){
+          importantLog("runnning " + gutil.colors.cyan(configuration.context) + " context from " +  gutil.colors.cyan(configuration.out))
           nodemon({
               execMap: {
                   js: 'node'

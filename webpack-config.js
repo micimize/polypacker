@@ -75,7 +75,7 @@ module.exports = function(options){
           }, {
             test: /\.ttf(\?.+)?$/, loader: "url?limit=10000&mimetype=application/octet-stream" 
           }, {
-            test: /\.eot(\?.+)?$/, loader: "file" 
+            test: /\.eot(\?.+)?$/, loader: "file&includePaths[]=" + (path.resolve(process.cwd(), "./node_modules"))
           }, {
             test: /\.svg(\?.+)?$/, loader: "url?limit=10000&mimetype=image/svg+xml"
           }, {
