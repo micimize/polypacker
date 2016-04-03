@@ -98,6 +98,7 @@ module.exports = function(options){
       config.plugins = [
 		new webpack.DefinePlugin({ $ES: { CONTEXT: JSON.stringify(context) || JSON.stringify('NODE'), ENV: JSON.stringify('DEVELOPMENT')} }),
         new webpack.HotModuleReplacementPlugin(),
+		new webpack.optimize.DedupePlugin(),
 		new webpack.NoErrorsPlugin(),
         new webpack.BannerPlugin(
           'require("source-map-support").install();',
