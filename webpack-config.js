@@ -12,6 +12,7 @@ var contextToTarget = {
 module.exports = function(options){
     var entry   = options.entry,
         out     = options.out,
+        hot     = options.hot,
         modules = options.modules,
         babelPresets = options.babelPresets || [],
         context = options.context,
@@ -106,7 +107,7 @@ module.exports = function(options){
         filename: path.basename(out),
       },
     }
-    if (env !== 'PRODUCTION'){
+    if (hot){
       config.devtool = 'source-map'
       config.debug = true
       config.plugins = [
