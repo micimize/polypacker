@@ -30,8 +30,15 @@ function parserFromArgumentMap(argumentMap){
     return addArgumentMapToParser(parser, argumentMap)
 }
 
+function flatten(arrays){
+    return [].concat.apply([], arrays);
+}
+
 function splitByContext(args){
-    contexts = args.contexts
+    if(Array.isArray(args)){
+        return flatten(args.map(splitByContext))
+    }
+    var contexts = args.contexts
     delete args.contexts
     return contexts.map(function(context){
         var contextArgs = clone(args)
@@ -39,6 +46,20 @@ function splitByContext(args){
         return contextArgs
     })
 }
+
+function splitByEnv(args){
+    if(Array.isArray(args)){
+        return flatten(args.map(splitByEnv))
+    }
+    var envs = args.environments
+    delete args.environments
+    return envs.map(function(env){
+        var envArgs = clone(args)
+        envArgs.env = env
+        return envArgs
+    })
+}
+
 function fromSrcDir(args){
     args.entry = args.entry || './src/index.js'
     args.modules = args.modules || './src'
@@ -47,7 +68,8 @@ function fromSrcDir(args){
 
 function defaultContextualComponent(args){
     args = fromSrcDir(args)
-    args.out = args.out || args.context && './dist/for/' + args.context.toLowerCase() + '.js'
+    args.out = args.out || args.context &&
+        './dist/for/' + args.context.toLowerCase() + '_' + args.env.toLowerCase() + '.js'
     return args
 }
 
@@ -84,11 +106,13 @@ var presets = {
     FULLSTACK_COMPONENT: function(args){
         handleIndexTemplate() // TODO: this and splitByContext don't handle args.out like they should
         args.contexts = ['NODE', 'BROWSER']
+        args.environments = ['DEVELOPMENT', 'PRODUCTION']
         var contexts = splitByContext(args)
-        for (i = 0; i < contexts.length; i++) {
-            contexts[i] = defaultContextualComponent(contexts[i])
+        var compilers = splitByEnv(contexts)
+        for (i = 0; i < compilers.length; i++) {
+            compilers[i] = defaultContextualComponent(compilers[i])
         }
-        return taskWrapper(contexts, args.watch ? 'watch' : 'dist')
+        return taskWrapper(compilers, args.watch ? 'watch' : 'dist')
     },
     NODE_APPLICATION: function(args){
         args.context = 'NODE'
@@ -119,7 +143,7 @@ function applyPreset(args){
         return taskWrapper([args], selectTask(args))
     }
 }
-
+var attrHelp = 'There can be multiple (each a seperate argument), and they will contribute to the cross product of compilers'
 var parser = parserFromArgumentMap({
     entry: {
         help: 'main entry point for your program, across all contexts'
@@ -138,12 +162,15 @@ var parser = parserFromArgumentMap({
         help: 'Which context to run on compilation, if any'
     },
     env: {
-        help: 'application lifecycle environment. This should probably be deployment or something'
+        aliases: ['-e', '--environment'],
+        dest: 'environments',
+        help: 'an application lifecycle environment {DEVELOPMENT, PRODUCTION, etc} this distribution will run in. ' + attrHelp ,
+        action: 'append'
     },
     context: {
         aliases: ['-c'],
         dest: 'contexts',
-        help: 'a context this distribution will run in. There can be multiple, and they will be split into seperate compilers',
+        help: 'a context {NODE, BROWSER, etc} this distribution will run in. ' + attrHelp ,
         action: 'append'
     },
     preset: {
@@ -151,7 +178,8 @@ var parser = parserFromArgumentMap({
             reference to a preset build configuration. For instance, FULLSTACK_COMPONENT references {\
             entry: ./src/entry.js\
             contexts: [NODE, BROWSER]\
-            out: ./dist/for/$context.js\
+            environments: [DEVELOPMENT, PRODUCTION]\
+            out: ./dist/for/$context_$env.js\
         }. Presets are actually functions that take in the given user args, and thus can have fairly intricate logic.',
     },
     babelPreset: {

@@ -25,6 +25,7 @@
     "babel-preset-es2015": "6.3.13",
     "babel-preset-react": "^6.5.0",
     "babel-preset-stage-0": "6.3.13",
+    "callback-loader": "^0.2.4",
     "gulp": "^3.8.11",
     "gulp-util": "^3.0.7",
     "imports-loader": "^0.6.5",

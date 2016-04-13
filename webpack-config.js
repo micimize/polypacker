@@ -16,6 +16,7 @@ module.exports = function(options){
         babelPresets = options.babelPresets || [],
         context = options.context,
         env     = options.env || process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() || 'DEVELOPMENT';
+    var compound_version = context.toLowerCase() + '_' + env.toLowerCase()
     process.chdir(process.env.PWD)
     babelPresets.unshift('es2015')
     babelPresets.push('stage-0')
@@ -26,7 +27,7 @@ module.exports = function(options){
       plugins: [
 		new webpack.DefinePlugin({
           $ES: {
-              CONTEXT: JSON.stringify(context) || JSON.stringify('NODE'),
+              CONTEXT: JSON.stringify(context || 'NODE'),
               ENV: JSON.stringify(env)
           }
         }),
@@ -48,7 +49,19 @@ module.exports = function(options){
       context: path.resolve(pwd),
       resolve: {
         moduleDirectories: [modules, "node_modules"],
-        extensions: ['', '.json', '.js', '.jsx']
+        extensions: ['', '.json', '.js', '.jsx'],
+      },
+      resolveLoader: {
+          alias: { polypack: 'callback?polypack' }
+      },
+      callbackLoader: {
+          polypack: function(mod) {
+              if(mod){
+                  return 'require("' + mod + '/dist/for/' + compound_version + '") //polypacked secondhand'
+              } else {
+                   return 'require("./for/' + compound_version + '") //polypacked by dist'
+              }
+          }
       },
       module: {
         loaders: [
