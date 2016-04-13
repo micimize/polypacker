@@ -1,3 +1,1 @@
-module.exports = {
-    default: require('./for/' + $ES.CONTEXT.toLowerCase())
-}
+module.exports = polypack()

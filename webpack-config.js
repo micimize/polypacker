@@ -16,7 +16,7 @@ module.exports = function(options){
         babelPresets = options.babelPresets || [],
         context = options.context,
         env     = options.env || process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() || 'DEVELOPMENT';
-    var compound_version = context.toLowerCase() + '_' + env.toLowerCase()
+    var compound_version = (context && env) ? context.toLowerCase() + '_' + env.toLowerCase() : 'index'
     process.chdir(process.env.PWD)
     babelPresets.unshift('es2015')
     babelPresets.push('stage-0')
@@ -31,6 +31,7 @@ module.exports = function(options){
               ENV: JSON.stringify(env)
           }
         }),
+		new webpack.DefinePlugin({"process.env": {NODE_ENV: '"'+env.toLowerCase()+'"'}}),
 		new webpack.optimize.DedupePlugin(),
 		new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.BannerPlugin(

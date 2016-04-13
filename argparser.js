@@ -40,11 +40,11 @@ function splitByContext(args){
     }
     var contexts = args.contexts
     delete args.contexts
-    return contexts.map(function(context){
+    return contexts ? contexts.map(function(context){
         var contextArgs = clone(args)
         contextArgs.context = context
         return contextArgs
-    })
+    }) : [args]
 }
 
 function splitByEnv(args){
@@ -53,11 +53,11 @@ function splitByEnv(args){
     }
     var envs = args.environments
     delete args.environments
-    return envs.map(function(env){
+    return envs ? envs.map(function(env){
         var envArgs = clone(args)
         envArgs.env = env
         return envArgs
-    })
+    }) : [args]
 }
 
 function fromSrcDir(args){
@@ -120,7 +120,8 @@ var presets = {
         args.out = args.out || './dist/index.js'
         args.run = true
         args = defaultContextualComponent(args)
-        return taskWrapper([args], args.watch ? 'watch-and-run' : 'run')
+        args = splitByEnv(args)
+        return taskWrapper(args, args.watch ? 'watch-and-run' : 'run')
     },
     FULLSTACK_APPLICATION: function(args){
         args.contexts = ['NODE', 'BROWSER']
@@ -140,7 +141,9 @@ function applyPreset(args){
     if (preset && presets[preset]) {
         return presets[preset](args)
     } else {
-        return taskWrapper([args], selectTask(args))
+        var contexts = splitByContext(args)
+        var compilers = splitByEnv(contexts)
+        return taskWrapper(compilers, selectTask(args))
     }
 }
 var attrHelp = 'There can be multiple (each a seperate argument), and they will contribute to the cross product of compilers'
