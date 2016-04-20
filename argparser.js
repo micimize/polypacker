@@ -161,6 +161,10 @@ var parser = parserFromArgumentMap({
         help: 'monitor source files for changes and recompile.',
         action: 'storeTrue'
     },
+    hot: {
+        help: 'enable hot module replacement',
+        action: 'storeTrue'
+    },
     run: {
         help: 'Which context to run on compilation, if any'
     },

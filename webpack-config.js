@@ -24,7 +24,14 @@ module.exports = function(options){
     var pwd = './'
     var config =  {
       devtool: 'source-map',
-      externals: [ nodeExternals() ],
+      externals: [
+          nodeExternals(),
+          function(context, request, callback) {
+              if(/^polypack!/.test(request))
+                  return callback(null, request.substr(9) + '/dist/for/' + compound_version);
+              callback();
+          },
+      ],
       plugins: [
 		new webpack.DefinePlugin({
           $ES: {
@@ -39,7 +46,6 @@ module.exports = function(options){
           'require("source-map-support").install();',
           { raw: true, entryOnly: false }
         ),
-        new webpack.optimize.UglifyJsPlugin(),
 		new webpack.NoErrorsPlugin(),
       ],
       target: contextToTarget[context],
@@ -53,16 +59,9 @@ module.exports = function(options){
         moduleDirectories: [modules, "node_modules"],
         extensions: ['', '.json', '.js', '.jsx'],
       },
-      resolveLoader: {
-          alias: { polypack: 'callback?polypack' }
-      },
       callbackLoader: {
-          polypack: function(mod) {
-              if(mod){
-                  return 'require("' + mod + '/dist/for/' + compound_version + '") //polypacked secondhand'
-              } else {
-                   return 'require("./for/' + compound_version + '") //polypacked by dist'
-              }
+          polypack: function() {
+              return 'require("./for/' + compound_version + '") //polypacked by dist'
           }
       },
       module: {
@@ -109,6 +108,8 @@ module.exports = function(options){
         filename: path.basename(out),
       },
     }
+    if (env.toLowerCase() == 'production')
+      config.plugins.push( new webpack.optimize.UglifyJsPlugin() );
     if (hot){
       config.devtool = 'source-map'
       config.debug = true

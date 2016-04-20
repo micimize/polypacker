@@ -1,7 +1,7 @@
 {
   "name": "polypacker",
-  "version": "0.0.1",
-  "description": "aims to provide context-driven code optimization and distribution for both multiple environments",
+  "version": "0.1.0",
+  "description": "aims to provide context-driven code optimization and distribution for multiple environments",
   "main": "./webpack-config",
   "bin": "./gulpfile.js",
   "scripts": {
