@@ -80,6 +80,8 @@ module.exports = function(options){
           }, {
             test: /\.json$/, loader: 'json'
           }, {
+            test: /\.html/, loader: 'html'
+          }, {
             test: /\.css$/, loader: 'style!css!postcss'
           }, {
             test: /\.less$/, loader: 'style!css!less'

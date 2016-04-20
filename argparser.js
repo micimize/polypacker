@@ -193,10 +193,11 @@ var parser = parserFromArgumentMap({
 })
 
 function configure(argstring){
-    if(argstring){
-        return applyPreset(parser.parseArgs(argstring.trim().split(/ +/)))
-    } else {
-        return applyPreset(parser.parseArgs())
+    var args = parser.parseKnownArgs(argstring && argstring.trim().split(/ +/))
+    return {
+        config: applyPreset(args[0]),
+        unknown: args[1]
     }
+    
 }
 module.exports = configure

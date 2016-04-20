@@ -28,8 +28,8 @@ function onFirstBuild(done) {
 }
 
 var wrapper = configure()
-var configurations = wrapper.compilers
-var selectedTask = wrapper.task
+var configurations = wrapper.config.compilers
+var selectedTask = wrapper.config.task
 
 function compileForAllConfigurations(done){
   var firedDone = false
@@ -80,6 +80,7 @@ function runSelectedContext(){
                   js: 'node'
               },
               script: path.join(process.env.PWD, configuration.out),
+              args: wrapper.unknown,
               ignore: ['*'],
               watch: ['nothing/'],
               ext: 'noop'
