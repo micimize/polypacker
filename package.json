@@ -1,6 +1,6 @@
 {
   "name": "polypacker",
-  "version": "0.1.0",
+  "version": "0.1.1-alpha",
   "description": "aims to provide context-driven code optimization and distribution for multiple environments",
   "main": "./webpack-config",
   "bin": "./gulpfile.js",
@@ -12,7 +12,7 @@
     "url": "git+https://github.com/michaeljosephrosenthal/polypacker.git"
   },
   "author": "Michael Joseph Rosenthal <rosenthalm93@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/michaeljosephrosenthal/polypacker/issues"
   },

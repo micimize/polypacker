@@ -1,6 +1,6 @@
 # Polypacker 
 context-driven js distribution tool for multiple environments, built with webpack and gulp.  
-This is used by [strictduck-bufflehead](https://github.com/strictduck/bufflehead) and related projects as a unified way to distribute and load javascript that runs in different contexts.  
+This is used by [bufflehead](https://github.com/strictduck/bufflehead) and related projects as a unified way to distribute and load javascript that runs in different contexts.  
 `npm install --save-dev polypacker`  
 
 #### author's note
