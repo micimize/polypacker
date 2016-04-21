@@ -59,6 +59,10 @@ module.exports = function(options){
         moduleDirectories: [modules, "node_modules"],
         extensions: ['', '.json', '.js', '.jsx'],
       },
+      resolveLoader: {
+        moduleDirectories: ["node_modules", "polypacker/node_modules"],
+        root: path.join(__dirname, "node_modules")
+      },
       callbackLoader: {
           polypack: function() {
               return 'require("./for/' + compound_version + '") //polypacked by dist'
@@ -70,7 +74,7 @@ module.exports = function(options){
             test: /\.js|\.jsx$/,
             loader: 'babel',
             query: {
-                presets: babelPresets
+                presets: babelPresets.map(function(preset){return 'babel-preset-' + preset}).map(require.resolve)
             },
             exclude: /node_modules/,
             postLoaders: [
