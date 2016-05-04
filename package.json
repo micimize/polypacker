@@ -28,6 +28,7 @@
     "babel-preset-stage-0": "6.3.13",
     "callback-loader": "^0.2.4",
     "css-loader": "^0.23.1",
+    "death": "^1.0.0",
     "file-loader": "^0.8.5",
     "gulp": "^3.8.11",
     "gulp-util": "^3.0.7",

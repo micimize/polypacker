@@ -81,23 +81,23 @@ module.exports = function(options){
             ],
             noParse: /\.min\.js/
           }, {
-            test: /\.json$/, loader: 'json'
+            test: /\.json$/, loader: 'json-loader'
           }, {
-            test: /\.html/, loader: 'html'
+            test: /\.html/, loader: 'html-loader'
           }, {
-            test: /\.css$/, loader: 'style!css!postcss'
+            test: /\.css$/, loader: 'style-loader!css-loader!postcss-loader'
           }, {
-            test: /\.less$/, loader: 'style!css!less'
+            test: /\.less$/, loader: 'style-loader!css-loader!less-loader'
           }, {
             test: /\.scss$/, loader: 'style-loader!css-loader!sass-loader?outputStyle=expanded&' + "includePaths[]=" + (path.resolve(process.cwd(), "./node_modules"))
           }, {
-            test: /\.woff(2)?(\?.+)?$/, loader: "url?limit=10000&mimetype=application/font-woff" 
+            test: /\.woff(2)?(\?.+)?$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" 
           }, {
-            test: /\.ttf(\?.+)?$/, loader: "url?limit=10000&mimetype=application/octet-stream" 
+            test: /\.ttf(\?.+)?$/, loader: "url-loader?limit=10000&mimetype=application/octet-stream" 
           }, {
-            test: /\.eot(\?.+)?$/, loader: "file&includePaths[]=" + (path.resolve(process.cwd(), "./node_modules"))
+            test: /\.eot(\?.+)?$/, loader: "file-loader&includePaths[]=" + (path.resolve(process.cwd(), "./node_modules"))
           }, {
-            test: /\.svg(\?.+)?$/, loader: "url?limit=10000&mimetype=image/svg+xml"
+            test: /\.svg(\?.+)?$/, loader: "url-loader?limit=10000&mimetype=image/svg+xml"
           }, {
             test: /\.png$/, loader: "url-loader?limit=100000" 
           }, {

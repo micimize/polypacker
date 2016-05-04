@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var webpack = require('webpack');
@@ -8,6 +7,7 @@ var fs = require('fs');
 var nodemon = require('nodemon');
 var webpackConfig = require('./webpack-config');
 var configure = require('./argparser');
+var ON_DEATH = require('death')
 
 function importantLog(str){
   gutil.log(gutil.colors.bgMagenta(" ") + " " + gutil.colors.bold(str))
@@ -27,14 +27,36 @@ function onFirstBuild(done) {
     }
 }
 
+function logImportantFromToAction(acting, configuration, color){
+    color = color || 'cyan'
+    importantLog(acting + " from '" + gutil.colors[color](configuration.entry) + "' to '" + gutil.colors[color](configuration.out) + "'")
+}
+
+
+function endWatch(watcher) {
+    watcher.close(function(){
+        logImportantFromToAction("stopped compiling", watcher._polypackConfiguration, 'magenta')
+        watching.count -= 1
+        if(!watching.count){
+            importantLog('all watchers stopped. Polypacker exited cleanly')
+            process.exit(0)
+        }
+    })
+}
+
+
 var wrapper = configure()
 var configurations = wrapper.config.compilers
 var selectedTask = wrapper.config.task
+var watching = {
+    count: 0,
+    compilers: []
+}
 
 function compileForAllConfigurations(done){
   var firedDone = false
   configurations.map(function(configuration){
-      importantLog("distributing from '" + gutil.colors.cyan(configuration.entry) + "' to '" + gutil.colors.cyan(configuration.out) + "'")
+      logImportantFromToAction("distributing", configuration)
       webpack(webpackConfig(configuration)).run(function(err,stats){
           if(!firedDone) {
               firedDone = true
@@ -55,8 +77,9 @@ var contextWatchActions = {
 
 function watchAllConfigurations(done){
   var firedDone = false;
-  configurations.map(function(configuration){
-      webpack(webpackConfig(configuration)).watch(250, function(err, stats) {
+  watching.compilers = configurations.map(function(configuration){
+      logImportantFromToAction("watching and distributing", configuration)
+      var watcher = webpack(webpackConfig(configuration)).watch(250, function(err, stats) {
           if(!firedDone) {
               firedDone = true;
               onFirstBuild(done)(err, stats)
@@ -67,6 +90,9 @@ function watchAllConfigurations(done){
               contextWatchActions[configuration.context](configuration)
           }
       })
+      watcher._polypackConfiguration = configuration
+      watching.count += 1
+      return watcher
   })
 }
 
@@ -99,3 +125,13 @@ gulp.task('watch-and-run', ['watch'], runSelectedContext);
 if (require.main === module) {
     gulp.start(selectedTask)
 }
+
+ON_DEATH(function(signal, err) {
+    if(watching.count){
+        console.log('\n')
+        importantLog('stopping watchers.')
+        watching.compilers.map(endWatch)
+    } else {
+        importantLog('Polypacker exited cleanly.')
+    }
+})

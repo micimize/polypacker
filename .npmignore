@@ -1,0 +1,7 @@
+node_modules
+.*.swp
+.*.swo
+npm-debug.log
+*hot-update.json
+*hot-update.js
+*hot-update.js.map
