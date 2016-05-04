@@ -12,9 +12,12 @@ var configure = require('./argparser');
 function log(str){
     console.log(str)
 }
+function pad(num){
+    return ("0"+num).slice(-2);
+}
 function shortTimestamp(){
     var d = new Date()
-    return d.getHours() + ':' + d.getMinutes() + '.' + d.getSeconds()
+    return pad(d.getHours()) + ':' + pad(d.getMinutes()) + '.' + pad(d.getSeconds())
 }
 function prefix(){
     return colors.magenta('[' + shortTimestamp() + '] ') + colors.bgMagenta(' ') 
@@ -82,7 +85,7 @@ function compileForAllConfigurations(done){
       webpack(webpackConfig(configuration)).run(function(err,stats){
           if(!firedDone) {
               firedDone = true
-              onFirstBuild(done)(err, stats)
+              onFirstBuild(done)(err, stats, configuration)
           } else {
               onBuild(err, stats, configuration)
           }
