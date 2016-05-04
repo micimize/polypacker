@@ -1,35 +1,65 @@
 #!/usr/bin/env node
 var gulp = require('gulp');
-var gutil = require('gulp-util');
+var colors = require('colors');
 var webpack = require('webpack');
 var path = require('path');
-var fs = require('fs');
 var nodemon = require('nodemon');
-var webpackConfig = require('./webpack-config');
-var configure = require('./argparser');
 var ON_DEATH = require('death')
 
-function importantLog(str){
-  gutil.log(gutil.colors.bgMagenta(" ") + " " + gutil.colors.bold(str))
+var webpackConfig = require('./webpack-config');
+var configure = require('./argparser');
+
+function log(str){
+    console.log(str)
+}
+function shortTimestamp(){
+    var d = new Date()
+    return d.getHours() + ':' + d.getMinutes() + '.' + d.getSeconds()
+}
+function prefix(){
+    return colors.magenta('[' + shortTimestamp() + '] ') + colors.bgMagenta(' ') 
 }
 
-// tasks
-function onBuild(err, stats) {
+function importantLog(str){
+  log( prefix() + " " + colors.bold(str))
+}
+
+// CONFIGURATION
+var wrapper = configure()
+var configurations = wrapper.config.compilers
+var selectedTask = wrapper.config.task
+var watching = {
+    count: 0,
+    compilers: []
+}
+function compoundVersion(options){
+    var context = options.context,
+        env     = options.env || process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() || 'DEVELOPMENT';
+    return (context && env) ? context.toLowerCase() + '_' + env.toLowerCase() : 'index'
+}
+
+function onBuild(err, stats, configuration) {
+    var compound_version = compoundVersion(configuration)
     if(err) {
-      console.log('Error', err);
+      importantLog(colors(red('Errors while building ' + compound_version) + '!'))
+      log('Error', err);
+    } else {
+        importantLog('successfully built ' + colors.cyan(compound_version))
     }
-    console.log(stats.toString({colors: true}));
+    if(wrapper.config.meta.logLevel == 'VERBOSE') {
+      log(stats.toString({colors: true}));
+    }     
 }
 function onFirstBuild(done) {
-    return function(err,stats){
-        onBuild(err,stats)
+    return function(err, stats, configuration){
+        onBuild(err,stats, configuration)
         done()
     }
 }
 
 function logImportantFromToAction(acting, configuration, color){
     color = color || 'cyan'
-    importantLog(acting + " from '" + gutil.colors[color](configuration.entry) + "' to '" + gutil.colors[color](configuration.out) + "'")
+    importantLog(acting + " from '" + colors[color](configuration.entry) + "' to '" + colors[color](configuration.out) + "'")
 }
 
 
@@ -45,14 +75,6 @@ function endWatch(watcher) {
 }
 
 
-var wrapper = configure()
-var configurations = wrapper.config.compilers
-var selectedTask = wrapper.config.task
-var watching = {
-    count: 0,
-    compilers: []
-}
-
 function compileForAllConfigurations(done){
   var firedDone = false
   configurations.map(function(configuration){
@@ -62,7 +84,7 @@ function compileForAllConfigurations(done){
               firedDone = true
               onFirstBuild(done)(err, stats)
           } else {
-              onBuild(err, stats)
+              onBuild(err, stats, configuration)
           }
       })
   })
@@ -82,9 +104,9 @@ function watchAllConfigurations(done){
       var watcher = webpack(webpackConfig(configuration)).watch(250, function(err, stats) {
           if(!firedDone) {
               firedDone = true;
-              onFirstBuild(done)(err, stats)
+              onFirstBuild(done)(err, stats, configuration)
           } else {
-              onBuild(err, stats)
+              onBuild(err, stats, configuration)
           }
           if(contextWatchActions[configuration.context]){
               contextWatchActions[configuration.context](configuration)
@@ -100,7 +122,7 @@ function watchAllConfigurations(done){
 function runSelectedContext(){
   configurations.map(function(configuration){
       if(configuration.run){
-          importantLog("runnning " + gutil.colors.cyan(configuration.context) + " context from " +  gutil.colors.cyan(configuration.out))
+          importantLog("runnning " + colors.cyan(configuration.context) + " context from " +  colors.cyan(configuration.out))
           nodemon({
               execMap: {
                   js: 'node'
@@ -128,7 +150,7 @@ if (require.main === module) {
 
 ON_DEATH(function(signal, err) {
     if(watching.count){
-        console.log('\n')
+        log('\n')
         importantLog('stopping watchers.')
         watching.compilers.map(endWatch)
     } else {

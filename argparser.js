@@ -85,12 +85,14 @@ function selectTask(conf){
     }
 }
 
-function taskWrapper(compilers, task){
+function taskWrapper(compilers, task, meta){
     return {
         task: task || 'dist', 
-        compilers: compilers
+        compilers: compilers,
+        meta: meta || {logLevel: compilers[0].logLevel || 'ERROR'}, 
     }
 }
+
 function handleIndexTemplate(){
     try {
         fs.lstatSync('./dist/index.js')
@@ -134,6 +136,10 @@ var presets = {
     }
 }
 
+function metaArgs(args){
+    return {logLevel: conf.logLevel}
+}
+
 function applyPreset(args){
     var preset = args.preset
     delete args.preset
@@ -143,7 +149,7 @@ function applyPreset(args){
     } else {
         var contexts = splitByContext(args)
         var compilers = splitByEnv(contexts)
-        return taskWrapper(compilers, selectTask(args))
+        return taskWrapper(compilers, selectTask(args), metaArgs(args))
     }
 }
 var attrHelp = 'There can be multiple (each a seperate argument), and they will contribute to the cross product of compilers'
@@ -194,6 +200,10 @@ var parser = parserFromArgumentMap({
         help: 'add a preset to the babel loader, between es2015 and stage-0',
         action: 'append'
     },
+    logLevel: {
+        defaultValue: 'ERROR',
+        help: 'VERBOSE will output webpack stats and warnings'
+    }
 })
 
 function configure(argstring){

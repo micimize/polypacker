@@ -133,5 +133,6 @@ module.exports = function(options){
     if(options.library){
         config.output.library = library
     }
+    config._compound_version = compound_version
     return config
 }
