@@ -136,7 +136,7 @@ var presets = {
     }
 }
 
-function metaArgs(args){
+function metaArgs(conf){
     return {logLevel: conf.logLevel}
 }
 
