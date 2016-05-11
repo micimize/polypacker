@@ -1,22 +1,17 @@
-var fs = require('fs');
-var path = require('path');
-var webpack = require('webpack');
-var nodeExternals = require('webpack-node-externals');
-var XRegExp = require('xregexp');
+import fs from 'fs'
+import path from 'path'
+import webpack from 'webpack'
+import nodeExternals from 'webpack-node-externals'
+import XRegExp from 'xregexp'
 
 var contextToTarget = {
     NODE: 'node',
     BROWSER: 'web'
 }
 
-module.exports = function(options){
-    var entry   = options.entry,
-        out     = options.out,
-        hot     = options.hot,
-        modules = options.modules,
-        babelPresets = options.babelPresets || [],
-        context = options.context,
-        env     = options.env || process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() || 'DEVELOPMENT';
+const derivedEnv = process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() || 'DEVELOPMENT'
+
+export default function webpackConfig({entry, out, hot, modules, babelPresets=[], context, env=derivedEnv, ...options}){
     var compound_version = (context && env) ? context.toLowerCase() + '_' + env.toLowerCase() : 'index'
     process.chdir(process.env.PWD)
     babelPresets.unshift('es2015')
@@ -26,9 +21,9 @@ module.exports = function(options){
       devtool: 'source-map',
       externals: [
           nodeExternals(),
-          function(context, request, callback) {
+          (context, request, callback) => {
               if(/^polypack!/.test(request))
-                  return callback(null, request.substr(9) + '/dist/for/' + compound_version);
+                  return callback(null, `${request.substr(9)}/dist/for/${compound_version}`);
               callback();
           },
       ],
@@ -39,13 +34,13 @@ module.exports = function(options){
               ENV: JSON.stringify(env)
           }
         }),
-		new webpack.DefinePlugin({"process.env": {NODE_ENV: '"'+env.toLowerCase()+'"'}}),
+		new webpack.DefinePlugin({"process.env": {NODE_ENV: `"${env.toLowerCase()}"`}}),
 		new webpack.optimize.DedupePlugin(),
 		new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.BannerPlugin(
+        /*new webpack.BannerPlugin(
           'require("source-map-support").install();',
           { raw: true, entryOnly: false }
-        ),
+        ),*/
 		new webpack.NoErrorsPlugin(),
       ],
       target: contextToTarget[context],
@@ -56,17 +51,20 @@ module.exports = function(options){
       },
       context: path.resolve(pwd),
       resolve: {
-        moduleDirectories: [modules, "node_modules"],
+        moduleDirectories: [modules, "node_modules", "node_modules/polypacker/node_modules"],
         extensions: ['', '.json', '.js', '.jsx'],
+        fallback: [
+            path.join(__dirname, "node_modules"),
+            path.join(path.resolve(pwd), "node_modules"),
+            path.join(path.resolve(pwd), "node_modules/polypacker/node_modules")
+        ]
       },
       resolveLoader: {
         moduleDirectories: ["node_modules", "polypacker/node_modules"],
         root: path.join(__dirname, "node_modules")
       },
       callbackLoader: {
-          polypack: function() {
-              return 'require("./for/' + compound_version + '") //polypacked by dist'
-          }
+          polypack: _ => `require("./for/${compound_version}") //polypacked by dist`
       },
       module: {
         loaders: [
@@ -74,7 +72,7 @@ module.exports = function(options){
             test: /\.js|\.jsx$/,
             loader: 'babel',
             query: {
-                presets: babelPresets.map(function(preset){return 'babel-preset-' + preset}).map(require.resolve)
+                presets: babelPresets.map(preset => `babel-preset-${preset}`).map(require.resolve)
             },
             exclude: /node_modules/,
             postLoaders: [

@@ -1,38 +1,6 @@
-var fs = require('fs')
-var ArgumentParser = require('argparse').ArgumentParser
-
-function clone(obj) {
-    if (null == obj || "object" != typeof obj) return obj;
-    var copy = obj.constructor() || {}
-    for (var attr in obj) {
-        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
-    }
-    return copy;
-}
-
-function addArgumentMapToParser(parser, argumentMap){
-    for (var key in argumentMap) {
-        if (argumentMap.hasOwnProperty(key)) {
-            var argAliases = argumentMap[key].aliases || []
-            argAliases.unshift('--' + key)
-            parser.addArgument(argAliases, argumentMap[key])
-        }
-    }
-    return parser
-}
-
-function parserFromArgumentMap(argumentMap){
-    var parser = new ArgumentParser({
-        version: '0.0.1',
-        addHelp: true,
-        description: 'context-driven js distribution tool for multiple environments'
-    })
-    return addArgumentMapToParser(parser, argumentMap)
-}
-
-function flatten(arrays){
-    return [].concat.apply([], arrays);
-}
+import fs from 'fs'
+import { clone, parserFromArgumentMap, flatten } from './utils'
+import argumentMap from './argumentMap'
 
 function splitByContext(args){
     if(Array.isArray(args)){
@@ -110,10 +78,7 @@ var presets = {
         args.contexts = ['NODE', 'BROWSER']
         args.environments = ['DEVELOPMENT', 'PRODUCTION']
         var contexts = splitByContext(args)
-        var compilers = splitByEnv(contexts)
-        for (i = 0; i < compilers.length; i++) {
-            compilers[i] = defaultContextualComponent(compilers[i])
-        }
+        var compilers = splitByEnv(contexts).map(defaultContextualComponent)
         return taskWrapper(compilers, args.watch ? 'watch' : 'dist')
     },
     NODE_APPLICATION: function(args){
@@ -152,66 +117,12 @@ function applyPreset(args){
         return taskWrapper(compilers, selectTask(args), metaArgs(args))
     }
 }
-var attrHelp = 'There can be multiple (each a seperate argument), and they will contribute to the cross product of compilers'
-var parser = parserFromArgumentMap({
-    entry: {
-        help: 'main entry point for your program, across all contexts'
-    },
-    out: {
-        help: 'destination for compiled bundle'
-    },
-    modules: {
-        help: 'where to look for modules'
-    },
-    watch: {
-        help: 'monitor source files for changes and recompile.',
-        action: 'storeTrue'
-    },
-    hot: {
-        help: 'enable hot module replacement',
-        action: 'storeTrue'
-    },
-    run: {
-        help: 'Which context to run on compilation, if any'
-    },
-    env: {
-        aliases: ['-e', '--environment'],
-        dest: 'environments',
-        help: 'an application lifecycle environment {DEVELOPMENT, PRODUCTION, etc} this distribution will run in. ' + attrHelp ,
-        action: 'append'
-    },
-    context: {
-        aliases: ['-c'],
-        dest: 'contexts',
-        help: 'a context {NODE, BROWSER, etc} this distribution will run in. ' + attrHelp ,
-        action: 'append'
-    },
-    preset: {
-        help: '\
-            reference to a preset build configuration. For instance, FULLSTACK_COMPONENT references {\
-            entry: ./src/entry.js\
-            contexts: [NODE, BROWSER]\
-            environments: [DEVELOPMENT, PRODUCTION]\
-            out: ./dist/for/$context_$env.js\
-        }. Presets are actually functions that take in the given user args, and thus can have fairly intricate logic.',
-    },
-    babelPreset: {
-        dest: 'babelPresets',
-        help: 'add a preset to the babel loader, between es2015 and stage-0',
-        action: 'append'
-    },
-    logLevel: {
-        defaultValue: 'ERROR',
-        help: 'VERBOSE will output webpack stats and warnings'
-    }
-})
+var parser = parserFromArgumentMap(argumentMap)
 
-function configure(argstring){
-    var args = parser.parseKnownArgs(argstring && argstring.trim().split(/ +/))
+export default function configure(argstring){
+    let args = parser.parseKnownArgs(argstring && argstring.trim().split(/ +/))
     return {
         config: applyPreset(args[0]),
         unknown: args[1]
     }
-    
 }
-module.exports = configure
