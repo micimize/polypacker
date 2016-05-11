@@ -24,8 +24,12 @@ function onBuild(err, stats, configuration) {
     var compound_version = compoundVersion(configuration)
     var status = 'success'
     if(err) {
-      importantLog(colors.red('Errors while building ' + compound_version) + '!')
+      importantLog(colors.red(`Errors while building ${compound_version}!`), {color: 'red'})
       log('Error', err);
+      status = 'error'
+    } else if(stats.hasErrors()) {
+      importantLog(colors.red(`Errors while building ${compound_version}!`), {color: 'red'})
+      log(stats.toString({colors: true, errorDetails: true}));
       status = 'error'
     } else {
         importantLog('successfully built ' + colors.cyan(compound_version))
@@ -58,12 +62,9 @@ function compileForAllConfigurations(configurations){
         configurations.map(configuration => {
             logImportantFromToAction("distributing", configuration)
             webpack(webpackConfig(configuration)).run((err, stats) => {
-                console.log('conf')
-                console.log(configuration)
                 results[compoundVersion(configuration)] = onBuild(err, stats, configuration)
                 waiting -= 1
                 if(!waiting){
-                    console.log('resolving')
                     resolve(results)
                 }
             })
@@ -112,9 +113,7 @@ async function runSelectedContext(configurations, {unknown}){
       if(configuration.run){
           importantLog("runnning " + colors.cyan(configuration.context) + " context from " +  colors.cyan(configuration.out))
           nodemon({
-              execMap: {
-                  js: 'node'
-              },
+              execMap: { js: 'node' },
               script: path.join(process.env.PWD, configuration.out),
               args: unknown,
               ignore: ['*'],
@@ -127,23 +126,25 @@ async function runSelectedContext(configurations, {unknown}){
   })
 }
 
-const tasks = {
-    dist: compileForAllConfigurations,
-    watch: watchAllConfigurations,
-    run: async function run(...args){
-        await compileForAllConfigurations(...args)
-        return runSelectedContext(...args)
-    },
-    'watch-and-run': async function watchAndRun(...args){
-        await watchAllConfigurations(...args)
-        return runSelectedContext(...args)
+function chain(...fns){
+    return async function(...args) {
+        for (let fn of fns){
+            await fn(...args)
+        }
     }
 }
 
-function exit(err){
-    if(err){
-        console.log(err)
-        throw err
+const tasks = {
+    'dist': compileForAllConfigurations,
+    'watch': watchAllConfigurations,
+    'run': chain(compileForAllConfigurations, runSelectedContext),
+    'watch-and-run': chain(watchAllConfigurations, runSelectedContext)
+}
+
+function exit({error} = {}){
+    if(error){
+        console.log(error)
+        throw error
     }
     if(watching.count){
         log('\n')
@@ -155,7 +156,7 @@ function exit(err){
 }
 
 export default function runTask({config: {compilers, task}, unknown}){
-    return tasks[task](compilers, {unknown}).then(exit).catch(exit)
+    return tasks[task](compilers, {unknown}).then(exit).catch(error => exit({error}))
 }
 
-ON_DEATH((signal, err) => exit(err))
+ON_DEATH((signal, error) => exit({error}))

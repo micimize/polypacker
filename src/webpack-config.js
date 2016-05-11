@@ -54,14 +54,14 @@ export default function webpackConfig({entry, out, hot, modules, babelPresets=[]
         moduleDirectories: [modules, "node_modules", "node_modules/polypacker/node_modules"],
         extensions: ['', '.json', '.js', '.jsx'],
         fallback: [
-            path.join(__dirname, "node_modules"),
+            path.join(__dirname, '..', "node_modules"),
             path.join(path.resolve(pwd), "node_modules"),
             path.join(path.resolve(pwd), "node_modules/polypacker/node_modules")
         ]
       },
       resolveLoader: {
         moduleDirectories: ["node_modules", "polypacker/node_modules"],
-        root: path.join(__dirname, "node_modules")
+        root: path.join(__dirname, "..", "node_modules")
       },
       callbackLoader: {
           polypack: _ => `require("./for/${compound_version}") //polypacked by dist`
@@ -75,8 +75,6 @@ export default function webpackConfig({entry, out, hot, modules, babelPresets=[]
                 presets: babelPresets.map(preset => `babel-preset-${preset}`).map(require.resolve)
             },
             exclude: /node_modules/,
-            postLoaders: [
-            ],
             noParse: /\.min\.js/
           }, {
             test: /\.json$/, loader: 'json-loader'

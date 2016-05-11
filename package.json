@@ -1,11 +1,12 @@
 {
   "name": "polypacker",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "aims to provide context-driven code optimization and distribution for multiple environments",
-  "main": "./webpack-config",
+  "main": "./dist/index.js",
   "bin": "./cli.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dist": "./cli.js --entry ./src/index.js --out ./dist/index.js --env PRODUCTION"
   },
   "repository": {
     "type": "git",

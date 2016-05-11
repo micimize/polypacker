@@ -13,12 +13,16 @@ export function shortTimestamp(){
     return pad(d.getHours()) + ':' + pad(d.getMinutes()) + '.' + pad(d.getSeconds())
 }
 
-export function prefix(){
-    return colors.magenta('[' + shortTimestamp() + '] ') + colors.bgMagenta(' ') 
+function upperFirst (str) {
+    return typeof str !="undefined"  ? (str += '', str[0].toUpperCase() + str.substr(1)) : '' ;
 }
 
-export function importantLog(str){
-  log( prefix() + " " + colors.bold(str))
+export function prefix({color = 'magenta'} = {}){
+    return colors[color]('[' + shortTimestamp() + '] ') + colors[`bg${upperFirst(color)}`](' ') 
+}
+
+export function importantLog(str, {color = 'magenta'} = {}){
+  log( prefix({color}) + " " + colors.bold(str))
 }
 
 export function logImportantFromToAction(acting, {entry, out}, color='cyan'){
