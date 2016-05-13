@@ -1,3 +1,3 @@
-export webpackBuilder from './webpack-config'
-export taskManager from './taskManager'
+export configBuilder, { autoLoader } from './webpacker'
+export taskManager, { run } from './taskManager'
 export parser from './argparser'

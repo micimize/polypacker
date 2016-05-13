@@ -4,8 +4,9 @@ import path from 'path'
 import nodemon from 'nodemon'
 import ON_DEATH from 'death'
 
-import webpackConfig from './webpack-config'
+import webpackConfig from './webpacker'
 import configure from './argparser'
+import identity, { sign } from './identity'
 
 import { log, importantLog, logImportantFromToAction } from './logging'
 
@@ -14,14 +15,34 @@ var watching = {
     compilers: []
 }
 
-function compoundVersion(options){
-    var context = options.context,
-        env     = options.env || process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() || 'DEVELOPMENT';
-    return (context && env) ? context.toLowerCase() + '_' + env.toLowerCase() : 'index'
+const polywatch = Symbol(polywatch)
+
+function endWatch(watcher) {
+    watcher.close(function(){
+        logImportantFromToAction("stopped compiling", watcher, 'magenta')
+        watching.count -= 1
+        if(!watching.count){
+            importantLog('all watchers stopped. Polypacker exited cleanly')
+            process.exit(0)
+        }
+    })
+}
+
+function polypack(configuration){
+    let compiler = webpack(webpackConfig(configuration))
+    compiler[identity] = configuration[identity]
+    compiler[polywatch] = (...args) => {
+        let watcher = compiler.watch(...args)
+        watching.count += 1
+        watcher[identity] = configuration[identity]
+        watching.compilers.push(watcher)
+        return watcher
+    }
+    return compiler
 }
 
 function onBuild(err, stats, configuration) {
-    var compound_version = compoundVersion(configuration)
+    var compound_version = configuration[identity].signature
     var status = 'success'
     if(err) {
       importantLog(colors.red(`Errors while building ${compound_version}!`), {color: 'red'})
@@ -43,51 +64,49 @@ function onBuild(err, stats, configuration) {
     }
 }
 
-function endWatch(watcher) {
-    watcher.close(function(){
-        logImportantFromToAction("stopped compiling", watcher._polypackConfiguration, 'magenta')
-        watching.count -= 1
-        if(!watching.count){
-            importantLog('all watchers stopped. Polypacker exited cleanly')
-            process.exit(0)
-        }
+export function run(configuration, callback=_=>_){
+    polypack(configuration).run((err, stats) => {
+        results[configuration[identity].signature] = onBuild(err, stats, configuration)
+        callback({results})
     })
-}
+} 
 
 function compileForAllConfigurations(configurations){
     let waiting = configurations.length
     let results = {}
-    return new Promise((resolve/*, reject*/) => {
-        //resolve(results)
+    let rejection = null
+    return new Promise((resolve, reject) => {
         configurations.map(configuration => {
             logImportantFromToAction("distributing", configuration)
-            webpack(webpackConfig(configuration)).run((err, stats) => {
-                results[compoundVersion(configuration)] = onBuild(err, stats, configuration)
+            polypack(configuration).run((err, stats) => {
+                results[configuration[identity].signature] = onBuild(err, stats, configuration)
                 waiting -= 1
                 if(!waiting){
                     resolve(results)
                 }
             })
-        })/*
-        setTimeout(() => {
-            if(waiting)
-                reject(new Error(`compiler timed out with the results ${results}`))
-        }, 100000)*/
+        })
+        if(!rejection){
+            rejection = setTimeout(_ => {
+                if(waiting)
+                    reject(new Error(`compiler timed out with the results ${results}`))
+            }, 100000)
+        }
     })
 }
 
 var contextWatchActions = {
-    NODE: ({watch, run}) => watch && run ** nodemon.restart()
+    NODE: ({watch, run}) => watch && run && nodemon.restart()
 }
 
 function watchAllConfigurations(configurations){
     let waiting = configurations.length
     let results = {}
     return new Promise((resolve, reject) => {
-        watching.compilers = configurations.map(configuration => {
+        configurations.map(configuration => {
             logImportantFromToAction("watching and distributing", configuration)
-            var watcher = webpack(webpackConfig(configuration)).watch(250, (err, stats) => {
-                results[compoundVersion(configuration)] = onBuild(err, stats, configuration)
+            polypack(configuration)[polywatch](250, (err, stats) => {
+                results[configuration[identity].signature] = onBuild(err, stats, configuration)
                 if(contextWatchActions[configuration.context]){
                     contextWatchActions[configuration.context](configuration)
                 }
@@ -96,9 +115,6 @@ function watchAllConfigurations(configurations){
                     resolve(results)
                 }
             })
-            watcher._polypackConfiguration = configuration
-            watching.count += 1
-            return watcher
         })
         setTimeout(() => {
             if(waiting)
@@ -106,7 +122,6 @@ function watchAllConfigurations(configurations){
         }, 100000)
     })
 }
-
 
 async function runSelectedContext(configurations, {unknown}){
   configurations.map(configuration => {
@@ -135,16 +150,16 @@ function chain(...fns){
 }
 
 const tasks = {
-    'dist': compileForAllConfigurations,
+    'dist': chain(compileForAllConfigurations, exit),
     'watch': watchAllConfigurations,
     'run': chain(compileForAllConfigurations, runSelectedContext),
     'watch-and-run': chain(watchAllConfigurations, runSelectedContext)
 }
 
-function exit({error} = {}){
-    if(error){
-        console.log(error)
-        throw error
+function exit({err} = {}){
+    if(err){
+        console.log(err)
+        throw err
     }
     if(watching.count){
         log('\n')
@@ -152,11 +167,12 @@ function exit({error} = {}){
         watching.compilers.map(endWatch)
     } else {
         importantLog('Polypacker exited cleanly.')
+        process.exit(0)
     }
 }
 
-export default function runTask({config: {compilers, task}, unknown}){
-    return tasks[task](compilers, {unknown}).then(exit).catch(error => exit({error}))
+export default function runTask({config: {compilers, task}, unknown, callback = _=>_}){
+    return tasks[task](compilers.map(sign), {unknown}).then(callback).catch(err => exit({err}))
 }
 
-ON_DEATH((signal, error) => exit({error}))
+ON_DEATH((signal, err) => exit({err}))

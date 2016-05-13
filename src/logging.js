@@ -1,4 +1,5 @@
 import colors from 'colors'
+import identity from './identity'
 
 export function log(str){
     console.log(str)
@@ -25,13 +26,7 @@ export function importantLog(str, {color = 'magenta'} = {}){
   log( prefix({color}) + " " + colors.bold(str))
 }
 
-export function logImportantFromToAction(acting, {entry, out}, color='cyan'){
+export function logImportantFromToAction(acting, {[identity]: {entry, out}}, color='cyan'){
     importantLog(`${acting} from '${colors[color](entry)}' to '${colors[color](out)}'`)
-}
-
-function compoundVersion(options){
-    var context = options.context,
-        env     = options.env || process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() || 'DEVELOPMENT';
-    return (context && env) ? context.toLowerCase() + '_' + env.toLowerCase() : 'index'
 }
 

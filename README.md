@@ -97,3 +97,17 @@ Optional arguments:
                         add a preset to the babel loader, between es2015 and
                         stage-0
 ```
+
+### configuration
+For customizing the webpack loaders, you can use the `polypacker.loaders` key in your `package.json`: 
+```json
+  "polypacker": { "loaders": ["general-asset"] }
+```
+This feature is still nasceant, and will allow for customization in the future. For now, the options are the following:
+```javascript
+const defaultLoaderSetMap = {
+    'common-asset': ['woff', 'tff', 'eot', 'svg', 'png', 'jpg', 'png', 'eot', 'jpg'],
+    'web-asset': ['common-asset', 'json', 'html', 'css'],
+    'general-asset': ['web-asset', 'scss','less', 'sass', 'scss']
+}
+```
