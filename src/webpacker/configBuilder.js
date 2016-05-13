@@ -15,14 +15,14 @@ export default function webpackConfig({
     [identity]: polypackMeta,
     overrides = {}
 }){
-    process.chdir(process.env.PWD || './')
+    process.chdir(process.env.PWD)
     let config = Object.assign(
         polypackMeta ? {[identity]: polypackMeta} : {},
         io({entry, out}),
         target({context}),
         fixed(),
         plugin({env, context, plugins}),
-        resolve({pwd: './', modules, dirname: path.resolve(__dirname, '../../')}),
+        resolve({pwd: './', modules, dirname: path.join(__dirname, '..')}),
         module({babelPresets}),
         overrides
     )

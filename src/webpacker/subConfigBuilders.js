@@ -11,7 +11,7 @@ function babelLoader({babelPresets}){
         test: /\.js|\.jsx$/,
         loader: 'babel',
         query: {
-            presets: babelPresets.map(preset => `babel-preset-${preset}`).map(require.resolve)
+            presets: babelPresets.map(preset => `babel-preset-${preset}`)
         },
         exclude: /node_modules/,
         noParse: /\.min\.js/
@@ -27,7 +27,6 @@ export function plugin({env, context, plugins}){
                 ENV: JSON.stringify(env)
             }
         }),
-        new webpack.DefinePlugin({"process.env": {NODE_ENV: `"${env.toLowerCase()}"`}}),
         new webpack.BannerPlugin(
             'require("source-map-support").install();',
             { raw: true, entryOnly: false }
@@ -61,8 +60,8 @@ export function fixed() {
         devtool: 'source-map',
         cache: false,
         node: {
-            __dirname: true,
-            __filename: true
+            __dirname: false,
+            __filename: false
         },
         externals: [ nodeExternals() ]
     }
@@ -82,8 +81,7 @@ export function resolve({pwd, modules, dirname}) {
             fallback
         },
         resolveLoader: {
-            moduleDirectories: ["node_modules", "node_modules/polypacker/node_modules"],
-            root: path.join(dirname, "node_modules"),
+            moduleDirectories: ["node_modules", "polypacker/node_modules"],
             fallback
         },
     }
