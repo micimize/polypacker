@@ -1,14 +1,13 @@
 {
   "name": "polypacker",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "aims to provide context-driven code optimization and distribution for multiple environments",
   "main": "./dist/index.js",
   "bin": "./dist/cli.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dist": "./cli.js --entry ./src/index.js --out ./dist/index.js --env PRODUCTION --context NODE",
-    "dist-cli": "./cli.js --entry ./cli.js --out ./dist/cli.js --env PRODUCTION --context NODE",
-    "watch": "./cli.js --entry ./src/index.js --out ./dist/index.js --env PRODUCTION --context NODE --watch"
+    "dist": "./bootstrap.js --entry ./src/index.js --out ./dist/index.js --env PRODUCTION --context NODE",
+    "watch": "./bootstrap.js --entry ./src/index.js --out ./dist/index.js --env PRODUCTION --context NODE --watch"
   },
   "repository": {
     "type": "git",
