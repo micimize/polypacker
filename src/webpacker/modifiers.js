@@ -8,12 +8,16 @@ const modifiers = {
         let compound_version = config[polyPackerIdentity].signature
         config.externals.push(
             (context, request, callback) => {
-            if(/^polypack!/.test(request))
-                return callback(null, `${request.substr(9)}/dist/for/${compound_version}`);
-            callback();
-        })
+                if(/^polypack!/.test(request)){
+                    return callback(null, `${request.substr(9)}/dist/for/${compound_version}`)
+                }
+                callback();
+            }
+        )
         config.callbackLoader = {
-            polypack: _ => `require("./for/${compound_version}") //polypacked by dist`
+            polypack: (mod) => mod ?
+                `require("${mod}/dist/for/${compound_version}") //polypacked by dist` :
+                `require("./for/${compound_version}") //polypacked by dist`
         }
         return config
     },
@@ -21,7 +25,7 @@ const modifiers = {
         config.debug = true
         config.plugins.unshift(new webpack.HotModuleReplacementPlugin())
         config.externals = [nodeExternals({ whitelist: ["webpack/hot/poll?1000"] })]
-        config.plugins.unshift("webpack/hot/poll?1000")
+        config.entry.unshift("webpack/hot/poll?1000")
         return config
     },
     production: config => {

@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import webpack from 'webpack'
 import modify from './modifiers'
-import identity from '../identity'
+import identity, { sign } from '../identity'
 import { io, plugin, resolve, fixed, target, module } from './subConfigBuilders'
 
 const derivedEnv = process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() || 'DEVELOPMENT'
@@ -17,7 +17,7 @@ export default function webpackConfig({
 }){
     process.chdir(process.env.PWD)
     let config = Object.assign(
-        polypackMeta ? {[identity]: polypackMeta} : {},
+        polypackMeta ? {[identity]: polypackMeta} : sign({entry, out, hot, context, env}),
         io({entry, out}),
         target({context}),
         fixed(),

@@ -81,8 +81,9 @@ export function resolve({pwd, modules, dirname}) {
             fallback
         },
         resolveLoader: {
-            moduleDirectories: ["node_modules", "polypacker/node_modules"],
-            fallback
+            moduleDirectories: ["node_modules", "node_modules/polypacker/node_modules"],
+            fallback,
+            alias: { polypack: 'callback?polypack' }
         },
     }
 }

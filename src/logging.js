@@ -30,3 +30,25 @@ export function logImportantFromToAction(acting, {[identity]: {entry, out}}, col
     importantLog(`${acting} from '${colors[color](entry)}' to '${colors[color](out)}'`)
 }
 
+export function logCompilation(err, stats, {logLevel, signature}) {
+    var status = 'success'
+    if(err) {
+      importantLog(colors.red(`Errors while building ${signature}!`), {color: 'red'})
+      log('Error', err);
+      status = 'error'
+    } else if(stats.hasErrors()) {
+      importantLog(colors.red(`Errors while building ${signature}!`), {color: 'red'})
+      log(stats.toString({colors: true, errorDetails: true}));
+      status = 'error'
+    } else {
+        importantLog('successfully built ' + colors.cyan(signature))
+    }
+    if(logLevel == 'VERBOSE') {
+      log(stats.toString({colors: true}));
+    }
+    return {
+        compiler: signature,
+        status
+    }
+}
+

@@ -8,7 +8,7 @@ import webpackConfig from './webpacker'
 import configure from './argparser'
 import identity, { sign } from './identity'
 
-import { log, importantLog, logImportantFromToAction } from './logging'
+import { log, importantLog, logImportantFromToAction, logCompilation } from './logging'
 
 var watching = {
     count: 0,
@@ -41,27 +41,8 @@ function polypack(configuration){
     return compiler
 }
 
-function onBuild(err, stats, configuration) {
-    var compound_version = configuration[identity].signature
-    var status = 'success'
-    if(err) {
-      importantLog(colors.red(`Errors while building ${compound_version}!`), {color: 'red'})
-      log('Error', err);
-      status = 'error'
-    } else if(stats.hasErrors()) {
-      importantLog(colors.red(`Errors while building ${compound_version}!`), {color: 'red'})
-      log(stats.toString({colors: true, errorDetails: true}));
-      status = 'error'
-    } else {
-        importantLog('successfully built ' + colors.cyan(compound_version))
-    }
-    if(configuration.logLevel == 'VERBOSE') {
-      log(stats.toString({colors: true}));
-    }
-    return {
-        compiler: compound_version,
-        status
-    }
+function onBuild(err, stats, {logLevel, [identity]: {signature}}) {
+    return logCompilation(err, stats, {logLevel, signature})
 }
 
 export function run(configuration, callback=_=>_){
@@ -136,6 +117,8 @@ async function runSelectedContext(configurations, {unknown}){
               ext: 'noop'
           }).on('restart', () => {
               importantLog('Patched!')
+          }).on('quit', () => {
+              importantLog(colors.cyan(configuration.context) + " process quit") 
           })
       }
   })
