@@ -1,4 +1,3 @@
-import nodeExternals from 'webpack-node-externals'
 import webpack from 'webpack'
 
 import polyPackerIdentity from '../identity'
@@ -6,14 +5,16 @@ import polyPackerIdentity from '../identity'
 const modifiers = {
     polypack: config => {
         let compound_version = config[polyPackerIdentity].signature
-        config.externals.push(
-            (context, request, callback) => {
-                if(/^polypack!/.test(request)){
-                    return callback(null, `${request.substr(9)}/dist/for/${compound_version}`)
+        if(config.target == 'node'){
+            config.externals.push(
+                (context, request, callback) => {
+                    if(/^polypack!/.test(request)){
+                        return callback(null, `${request.substr(9)}/dist/for/${compound_version}`)
+                    }
+                    callback();
                 }
-                callback();
-            }
-        )
+            )
+        }
         config.callbackLoader = {
             polypack: (mod) => mod ?
                 `require("${mod}/dist/for/${compound_version}") //polypacked by dist` :
@@ -24,8 +25,7 @@ const modifiers = {
     hot: config => {
         config.debug = true
         config.plugins.unshift(new webpack.HotModuleReplacementPlugin())
-        config.externals = [nodeExternals({ whitelist: ["webpack/hot/poll?1000"] })]
-        config.entry.unshift("webpack/hot/poll?1000")
+        config.entry.unshift('webpack-hot-middleware/client')
         return config
     },
     production: config => {

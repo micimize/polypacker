@@ -1,6 +1,6 @@
 {
   "name": "polypacker",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "aims to provide context-driven code optimization and distribution for multiple environments",
   "main": "./dist/index.js",
   "bin": "./dist/cli.js",
@@ -36,7 +36,7 @@
     "read-json-sync": "^1.1.1",
     "source-map": "^0.5.3",
     "source-map-support": "^0.2.10",
-    "webpack": "^1.7.3",
+    "webpack": "^1.13.0",
     "webpack-hot-middleware": "^2.10.0",
     "webpack-node-externals": "^0.4.1"
   },

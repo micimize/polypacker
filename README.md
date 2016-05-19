@@ -63,8 +63,14 @@ From a normal `node.js` specific app that isn't polypacked, just reference the d
 ```
 
 ## CLI Usage / Help
-This is the current output of `node node_modules/polypacker/gulpfile.js --help`:
+This is the current output of `node node_modules/.bin/polypacker --help`:
 ```
+usage: polypacker [-h] [-v] [--entry ENTRY] [--out OUT] [--modules MODULES]
+              [--watch] [--hot] [--run RUN] [--env ENVIRONMENTS]
+              [--context CONTEXTS] [--preset PRESET]
+              [--babelPreset BABELPRESETS] [--logLevel LOGLEVEL]
+
+
 context-driven js distribution tool for multiple environments
 
 Optional arguments:
@@ -96,6 +102,7 @@ Optional arguments:
   --babelPreset BABELPRESETS
                         add a preset to the babel loader, between es2015 and
                         stage-0
+  --logLevel LOGLEVEL   VERBOSE will output webpack stats and warnings
 ```
 
 ### configuration
@@ -111,3 +118,5 @@ const defaultLoaderSetMap = {
     'general-asset': ['web-asset', 'scss','less', 'sass', 'scss']
 }
 ```
+To use these loaders, the dependent project has to depend on the appropriate loaders. 
+

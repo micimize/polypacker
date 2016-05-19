@@ -21,21 +21,22 @@ function babelLoader({babelPresets}){
 export function plugin({env, context, plugins}){
     return {
         plugins: [
-        new webpack.DefinePlugin({
-            $ES: {
-                CONTEXT: JSON.stringify(context || 'NODE'),
-                ENV: JSON.stringify(env)
-            }
-        }),
-        new webpack.BannerPlugin(
-            'require("source-map-support").install();',
-            { raw: true, entryOnly: false }
-        ),
-        ...plugins,
-        new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.NoErrorsPlugin(),
-    ]}
+            new webpack.DefinePlugin({
+                $ES: {
+                    CONTEXT: JSON.stringify(context || 'NODE'),
+                    ENV: JSON.stringify(env)
+                }
+            }),
+            /*new webpack.BannerPlugin(
+                'require("source-map-support").install();',
+                { raw: true, entryOnly: false }
+            ),*/
+            ...plugins,
+            //new webpack.optimize.DedupePlugin(),
+            new webpack.optimize.OccurenceOrderPlugin(),
+            new webpack.NoErrorsPlugin(),
+        ]
+    }
 }
 
 export function target({context}){
