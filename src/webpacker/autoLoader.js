@@ -22,15 +22,15 @@ export function expandSimpleLoaderMap(map){
     }, {})
 }
 
-const cssLoaders = [ 'style-loader', 'css-loader' ]
+const cssLoaders = [ 'style-loader', 'css-loader', 'postcss-loader' ]
 const defaultLoaderMap = Object.assign(
     expandSimpleLoaderMap({
         json: 'json-loader',
         html: 'html-loader',
-        css:  [ ...cssLoaders, 'postcss-loader'],
+        css:  cssLoaders,
         less: [ ...cssLoaders, 'less-loader'   ],
-        scss: [ ...cssLoaders, 'sass-loader'   ],
-        sass: [ ...cssLoaders, 'sass-loader'   ] 
+        scss: [ 'sass-loader'   ],
+        sass: [ 'sass-loader'   ] 
     }), {
         woff: {
             test: /\.woff(2)?(\?.+)?$/,

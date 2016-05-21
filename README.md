@@ -1,20 +1,17 @@
 # Polypacker 
 context-driven js distribution tool for multiple environments, built with webpack and gulp.  
-This is used by [bufflehead](https://github.com/strictduck/bufflehead) and related projects as a unified way to distribute and load javascript that runs in different contexts.  
+This is used by [bufflehead](https://github.com/strictduck/bufflehead) and [strictduck](https://github.com/strictduck) as a unified way to distribute and load javascript bundles that runs in different contexts/environments.  
 `npm install --save-dev polypacker`  
 
-#### author's note
-This tool is now in a mildly stable beta, at least for [me](https://github.com/michaeljosephrosenthal) doing [what I'm doing](https://github.com/strictduck). If you're using it for another use case, or you have insights into how I'm mishandling environment variables or something, let me know! 
-
-Polypacker is inspired by [meteor isobuild](https://www.meteor.com/isobuild) and borrows patterns and ideas heavily from [jlongster/backend-with-webpack](https://github.com/jlongster/backend-with-webpack).
+Polypacker is inspired by [meteor isobuild](https://www.meteor.com/isobuild) and initially started as a fork of [jlongster/backend-with-webpack](https://github.com/jlongster/backend-with-webpack).
 
 ## Overview
 ### distributing polypacks
-Polypacker uses the webpack `DefinePlugin` to inject a global variable `$ES` into the code that generally has the structure:
+Polypacker uses the webpack `DefinePlugin` to inject a global variable `$ES` into the code that currently has the structure:
 ```javascript
     $ES = {
-        ENV: ('PRODUCTION' | 'DEVELOPMENT'),
-        CONTEXT: ('NODE' | 'BROWSER'),
+        ENV: ('PRODUCTION' || 'DEVELOPMENT'),
+        CONTEXT: ('NODE' || 'BROWSER')
     }
 ```
 Then you can use it to base conditional requires off of in code, such as
@@ -23,7 +20,8 @@ Then you can use it to base conditional requires off of in code, such as
         require('./server') :
         require('./representation')
 ```
-When the code is run with the preset `FULLSTACK_COMPONENT`
+  
+When the code is run with the preset `FULLSTACK_COMPONENT`, a different bundle is generated for each combination:
 ```bash
 > polypacker --preset FULLSTACK_COMPONENT
 
@@ -32,6 +30,8 @@ When the code is run with the preset `FULLSTACK_COMPONENT`
 [23:59:17]   distributing from './src/index.js' to './dist/for/browser_development.js'
 [23:59:17]   distributing from './src/index.js' to './dist/for/browser_production.js'
 ```
+`polypacker` also writes `module.exports = polypack()` to `./dist/index.js`, which enables the polypack loader to locate the approriate bundle.
+
 Usually you'll want to add this to your `package.json` in the form
 ```json
 { "scripts": { "dist": "polypacker --preset FULLSTACK_COMPONENT" } }
@@ -118,5 +118,5 @@ const defaultLoaderSetMap = {
     'general-asset': ['web-asset', 'scss','less', 'sass', 'scss']
 }
 ```
-To use these loaders, the dependent project has to depend on the appropriate loaders. 
+To use this feature, the dependent project has to depend on the appropriate [underlying webpack loaders](https://github.com/michaeljosephrosenthal/polypacker/blob/master/src/webpacker/autoLoader.js#L26-L54), such as `url-loader`, or `file-loader`. In the future, these will be either automatically installed by `polypacker`, or specified as dependencies such as `polypack-general-asset-loader` that will pull in the underlying webpack loaders.
 
