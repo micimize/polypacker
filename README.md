@@ -62,10 +62,10 @@ From a normal `node.js` specific app that isn't polypacked, just reference the d
     ).default
 ```
 
-### Technical details, presets
+### Technical details, `--presets`
 Under the covers, polypacker takes the various combinations of the `--context` and `--env` options, generates a webpack configuration for each, and then applies the appropriate compiler action (distribution or watching). A [`--preset`](https://github.com/michaeljosephrosenthal/polypacker/blob/master/src/argparser/presetMap.js) applies the given internal function to the cli arguments _before_ expanding them into the array of webpack configs.
 
-So, for example [`polypacker --preset FULLSTACK_COMPONENT --watch`](https://github.com/michaeljosephrosenthal/polypacker/blob/master/src/argparser/presetMap.js#L35-L42) has the following forms before finally leaving the `argparser`:
+So, for example, [`polypacker --preset FULLSTACK_COMPONENT --watch`](https://github.com/michaeljosephrosenthal/polypacker/blob/master/src/argparser/presetMap.js#L35-L42) has the following forms before finally leaving the `argparser`:
 ```javascript
 { watch: true }
 //=>
