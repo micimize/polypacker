@@ -72,7 +72,7 @@ So, for example [`polypacker --preset FULLSTACK_COMPONENT --watch`](https://gith
 {
     watch: true,
     contexts: ['NODE', 'BROWSER'],
-    environments: ['DEVELOPMENT', 'PRODUCTION']}`
+    environments: ['DEVELOPMENT', 'PRODUCTION']}
 }
 //=>
 [
