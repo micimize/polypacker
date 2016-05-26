@@ -58,8 +58,7 @@ export function output(out){
 
 export function fixed() {
     return {
-        devtool: 'source-map',
-        cache: false,
+        devtool: '#eval-cheap-source-map',
         node: {
             __dirname: false,
             __filename: false

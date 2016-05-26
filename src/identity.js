@@ -12,6 +12,7 @@ export function sign(obj = {}){
         signature: compound({context, env}),
         entry, out, hot
     }
+    delete obj.hot
     return obj
 }
 

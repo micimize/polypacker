@@ -23,7 +23,6 @@ const modifiers = {
         return config
     },
     hot: config => {
-        config.debug = true
         config.plugins.unshift(new webpack.HotModuleReplacementPlugin())
         config.entry.unshift('webpack-hot-middleware/client')
         return config
