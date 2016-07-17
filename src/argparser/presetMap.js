@@ -1,5 +1,7 @@
 import fs from 'fs'
 import { taskWrapper, splitByContext, splitByEnv } from './utils'
+import { devServerRunner } from '../runners'
+import BundleTracker from 'webpack-bundle-tracker'
 
 function fromSrcDir(args){
     args.entry = args.entry || './src/index.js'
@@ -49,6 +51,24 @@ export function NODE_APPLICATION(args){
     args = defaultContextualComponent(args)
     args = splitByEnv(args)
     return taskWrapper(args, args.watch ? 'watch-and-run' : 'run')
+}
+
+export function STANDALONE_BROWSER_APPLICATION(args){
+    args.runner = devServerRunner
+    args.context = 'BROWSER'
+    args.bundle = true
+    delete args.contexts
+    args.out = args.out || './dist/index.js'
+    args = defaultContextualComponent(args)
+    let task = args.run ? 'just-run' : 'dist'
+    args = splitByEnv(args)
+    return taskWrapper(args, task)
+}
+
+export function DJANGO_REACT(args){
+    args.plugins = [new BundleTracker({filename: './webpack-stats.json'})]
+    args.babelPresets = ['react']
+    return STANDALONE_BROWSER_APPLICATION(args)
 }
 
 export function FULLSTACK_APPLICATION(args){

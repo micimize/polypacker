@@ -1,11 +1,11 @@
 import colors from 'colors'
 import webpack from 'webpack'
 import path from 'path'
-import nodemon from 'nodemon'
 import ON_DEATH from 'death'
 
 import webpackConfig from './webpacker'
 import configure from './argparser'
+import defaultRunner  from './runners'
 import identity, { sign } from './identity'
 
 import { log, importantLog, logImportantFromToAction, logCompilation } from './logging'
@@ -77,7 +77,7 @@ function compileForAllConfigurations(configurations){
 }
 
 var contextWatchActions = {
-    NODE: ({watch, run}) => watch && run && nodemon.restart()
+    NODE: ({watch, run, runner = defaultRunner}) => watch && run && runner.restart()
 }
 
 function watchAllConfigurations(configurations){
@@ -107,19 +107,8 @@ function watchAllConfigurations(configurations){
 async function runSelectedContext(configurations, {unknown}){
   configurations.map(configuration => {
       if(configuration.run){
-          importantLog("runnning " + colors.cyan(configuration.context) + " context from " +  colors.cyan(configuration.out))
-          nodemon({
-              execMap: { js: 'node' },
-              script: path.join(process.env.PWD, configuration.out),
-              args: unknown,
-              ignore: ['*'],
-              watch: ['nothing/'],
-              ext: 'noop'
-          }).on('restart', () => {
-              importantLog('Patched!')
-          }).on('quit', () => {
-              importantLog(colors.cyan(configuration.context) + " process quit") 
-          })
+          let { runner = defaultRunner } = configuration
+          runner.run({configuration, args: unknown})
       }
   })
 }
@@ -136,6 +125,7 @@ const tasks = {
     'dist': chain(compileForAllConfigurations, exit),
     'watch': watchAllConfigurations,
     'run': chain(compileForAllConfigurations, runSelectedContext),
+    'just-run': runSelectedContext,
     'watch-and-run': chain(watchAllConfigurations, runSelectedContext)
 }
 

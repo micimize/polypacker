@@ -8,7 +8,7 @@ import { io, plugin, resolve, fixed, target, module } from './subConfigBuilders'
 const derivedEnv = process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() || 'DEVELOPMENT'
 
 export default function webpackConfig({
-    entry, out, hot, modules, context,
+    entry, out, hot, bundle, modules, context,
     env=derivedEnv,
     babelPresets=[],
     plugins=[],
@@ -26,5 +26,5 @@ export default function webpackConfig({
         module({babelPresets}),
         overrides
     )
-    return modify({config, env, hot})
+    return modify({config, env, hot, bundle})
 }

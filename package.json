@@ -1,6 +1,6 @@
 {
   "name": "polypacker",
-  "version": "0.1.10",
+  "version": "0.1.11-alpha0-django",
   "description": "aims to provide context-driven code optimization and distribution for multiple environments",
   "main": "./dist/index.js",
   "bin": "./dist/cli.js",
@@ -37,8 +37,15 @@
     "source-map": "^0.5.3",
     "source-map-support": "^0.2.10",
     "webpack": "^1.13.0",
+    "webpack-bundle-tracker": "0.0.93",
+    "webpack-dev-server": "^1.14.1",
     "webpack-hot-middleware": "^2.10.0",
     "webpack-node-externals": "^0.4.1"
   },
-  "babel": { "presets": [ "es2015", "stage-0" ] }
+  "babel": {
+    "presets": [
+      "es2015",
+      "stage-0"
+    ]
+  }
 }
