@@ -57,10 +57,12 @@ export function STANDALONE_BROWSER_APPLICATION(args){
     args.runner = devServerRunner
     args.context = 'BROWSER'
     args.bundle = true
+    args.run = args.watch && args.context
+    args.hot = args.hot || args.watch
     delete args.contexts
     args.out = args.out || './dist/index.js'
     args = defaultContextualComponent(args)
-    let task = args.run ? 'just-run' : 'dist'
+    let task = args.watch ? 'just-run' : 'dist'
     args = splitByEnv(args)
     return taskWrapper(args, task)
 }

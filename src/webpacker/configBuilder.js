@@ -16,8 +16,9 @@ export default function webpackConfig({
     overrides = {}
 }){
     process.chdir(process.env.PWD)
+    let meta = polypackMeta ? {[identity]: polypackMeta} : sign({entry, out, hot, context, env})
     let config = Object.assign(
-        polypackMeta ? {[identity]: polypackMeta} : sign({entry, out, hot, context, env}),
+        meta,
         io({entry, out}),
         target({context}),
         fixed(),
@@ -26,5 +27,5 @@ export default function webpackConfig({
         module({babelPresets}),
         overrides
     )
-    return modify({config, env, hot, bundle})
+    return modify({config, env, hot: meta[identity].hot, bundle})
 }
