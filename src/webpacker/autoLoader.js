@@ -1,4 +1,4 @@
-import readJsonSync from 'read-json-sync'
+import extensible from '../extensible'
 
 function simpleTemplate({name, ...data}){
     return {
@@ -58,17 +58,17 @@ const defaultLoaderSetMap = {
     'web-asset': ['common-asset', 'json', 'html', 'css'],
     'general-asset': ['web-asset', 'scss','less', 'sass', 'scss']
 }
-function buildExpander(loaderSetMap){
-    return function expandLoader(loaders, explicit){
+
+function buildResolver(loaderSetMap){
+    function resolveLoader(loaders, explicit){
         loaderSetMap[explicit] ?
             loaderSetMap[explicit].forEach(name => loaders = expandLoader(loaders, name)) :
-            loaders[explicit + (explicit.endsWith('-loader') ? '' : '-loader')] = true
+            loaders.push(explicit + (explicit.endsWith('-loader') ? '' : '-loader'))
         return loaders
     }
-}
-
-function expandExplicitLoaders(explicitLoaders, loaderSetMap){
-    return explicitLoaders.reduce(buildExpander(loaderSetMap), {})
+    return function resolver(loaders){
+        return loaders.reduce(resolveLoader, [])
+    }
 }
 
 export default function autoLoader({
@@ -76,13 +76,21 @@ export default function autoLoader({
     loaderMap = defaultLoaderMap,
     loaderSetMap = defaultLoaderSetMap,
 } = {}){
-    let json = readJsonSync(jsonPath)
 
-    let dependencyPool = Object.assign({}, json.dependencies, json.devDpendencies,
-        expandExplicitLoaders(json.polypacker ? json.polypacker.loaders : [], loaderSetMap))
-    return Object.keys(dependencyPool)
-        .filter(name => name.endsWith('-loader'))
-        .map(name => name.replace(/-loader$/,''))
-        .map(name => loaderMap[name])
-        .filter(name => name)
+    function handler(loaders){
+        return loaders.filter(name => name.endsWith('-loader'))
+            .map(name => name.replace(/-loader$/,''))
+            .map(name => loaderMap[name])
+            .filter(name => name)
+    }
+
+    return extensible({
+        handler,
+        sources: [
+            {path: '$.[dependencies,devDependencies][?(@.endsWith("-loader"))]'},
+            {path: '$.polypacker.loaders', resolver: buildResolver(loaderSetMap)},
+        ]
+    })
 }
+
+

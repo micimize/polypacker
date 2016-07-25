@@ -27,12 +27,7 @@ export function plugin({env, context, plugins}){
                     ENV: JSON.stringify(env)
                 }
             }),
-            /*new webpack.BannerPlugin(
-                'require("source-map-support").install();',
-                { raw: true, entryOnly: false }
-            ),*/
             ...plugins,
-            //new webpack.optimize.DedupePlugin(),
             new webpack.optimize.OccurenceOrderPlugin(),
             new webpack.NoErrorsPlugin(),
         ]

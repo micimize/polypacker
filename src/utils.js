@@ -33,3 +33,19 @@ export function parserFromArgumentMap(argumentMap){
 export function flatten(arrays){
     return [].concat.apply([], arrays);
 }
+
+export function uniquify(list){
+    return Object.keys(list.reduce((map, item) => Object.assign(map, {[item]: true}), {}))
+}
+
+function mergeArrays(arrays){
+    return uniquify(flatten(arrays))
+}
+
+function mergeObjects(objects){
+    return Object.assign({}, ...objects)
+}
+
+export function merge(...args){
+    return (Array.isArray(args[0])) ? mergeArrays(args) : mergeObjects(args)
+}

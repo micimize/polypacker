@@ -1,2 +1,2 @@
-export default from './configBuilder'
+export default from './webpacker'
 export autoLoader from './autoLoader'
