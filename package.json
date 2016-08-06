@@ -50,5 +50,8 @@
       "es2015",
       "stage-0"
     ]
+  },
+  "devDependencies": {
+    "mocha": "^3.0.1"
   }
 }
