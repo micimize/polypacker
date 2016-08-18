@@ -24,12 +24,14 @@ const argumentMap = {
         aliases: ['-e', '--environment'],
         dest: 'environments',
         help: 'an application lifecycle environment {DEVELOPMENT, PRODUCTION, etc} this distribution will run in. ' + attrHelp ,
+        choices: ['DEVELOPMENT', 'PRODUCTION'],
         action: 'append'
     },
     context: {
         aliases: ['-c'],
         dest: 'contexts',
         help: 'a context {NODE, BROWSER, etc} this distribution will run in. ' + attrHelp ,
+        choices: ['NODE', 'BROWSER'],
         action: 'append'
     },
     preset: {
@@ -49,6 +51,7 @@ const argumentMap = {
     },
     logLevel: {
         defaultValue: 'ERROR',
+        choices: ['ERROR', 'VERBOSE'],
         help: 'VERBOSE will output webpack stats and warnings'
     }
 }

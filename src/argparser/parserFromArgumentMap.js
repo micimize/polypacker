@@ -2,11 +2,13 @@ import { ArgumentParser } from 'argparse'
 import argumentMap from './argumentMap'
 
 export function addArgumentMapToParser(parser, argumentMap){
-    for (var key in argumentMap) {
-        if (argumentMap.hasOwnProperty(key)) {
-            var argAliases = argumentMap[key].aliases || []
+    let args = Object.keys(argumentMap).reduce((clone, key) => (
+       Object.assign(clone, {[key]: Object.assign({}, argumentMap[key])})), {})
+    for (var key in args) {
+        if (args.hasOwnProperty(key)) {
+            var argAliases = args[key].aliases || []
             argAliases.unshift('--' + key)
-            parser.addArgument(argAliases, argumentMap[key])
+            parser.addArgument(argAliases, args[key])
         }
     }
     return parser

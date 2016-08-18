@@ -4,8 +4,13 @@ import applyPreset from './presets'
 
 const parser = parserFromArgumentMap(argumentMap)
 
-export default function parse(argstring){
+export function parseArgs(argstring){
     let [config, unknown] = parser.parseKnownArgs(argstring && argstring.trim().split(/ +/))
+    return { config, unknown }
+}
+
+export default function parse(argstring){
+    let {config, unknown} = parseArgs(argstring)
     return {
         config: applyPreset(config),
         unknown
