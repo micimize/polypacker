@@ -2,7 +2,7 @@
 require('babel-register')
 require('babel-polyfill')
 var taskManager = require('./src/taskManager').default
-var argParser = require('./src/argparser').default
+var argParser = require('./src/parser').default
 
 if (require.main === module) {
     process.stdout._handle.setBlocking(true);

@@ -1,7 +1,7 @@
 import 'babel-polyfill'
 import { assert } from 'chai'
-import { parseArgs } from '../../src/argparser/parser'
-import argumentMap from '../../src/argparser/argumentMap'
+import { parseArgs } from '../../src/parser/parser'
+import argumentMap from '../../src/parser/argumentMap'
 import G from 'generatorics'
 
 function combine(combination, defaultMap){

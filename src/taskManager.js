@@ -4,7 +4,7 @@ import path from 'path'
 import ON_DEATH from 'death'
 
 import webpackConfig from './webpacker'
-import configure from './argparser'
+import configure from './parser'
 import defaultRunner  from './runners'
 import identity, { sign } from './identity'
 
