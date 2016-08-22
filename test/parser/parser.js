@@ -4,6 +4,8 @@ import { parseArgs } from '../../src/parser/parser'
 import argumentMap from '../../src/parser/argumentMap'
 import G from 'generatorics'
 
+var logData = ''
+
 function combine(combination, defaultMap){
     return combination.reduce((test, {input, expected}) => ({
             input: input ? `${test.input} ${input}` : test.input,
@@ -17,6 +19,7 @@ function* powerSetGenerator(combination, defaultMap){
     }
 }
 
+
 function* cartesianGenerator(snippets, defaultMap){
     let cartesian = G.cartesian(...snippets)
     for (var combination of cartesian) {  
@@ -25,7 +28,7 @@ function* cartesianGenerator(snippets, defaultMap){
 }
 
 function* fullPowerSetGenerator(snippets, defaultMap){
-    for (var combination of cartesianGenerator(snippets, defaultMap)) {  
+    for (var combination of G.cartesian(...snippets)) {  
         yield* powerSetGenerator(combination, defaultMap)
     }
 }
@@ -124,16 +127,21 @@ const nonDerivedValues = {
 
 function testAllAgainst(func, generator){
     return cb => {
+        var count = 0
          while(true) {
             let { value: { input, expected} = {}, done } = generator.next()
-            if(done)
+            count += 1
+            if(done){
+                logData = `[ ${count} variations ]`
                 break;
+            }
             let actual = Object.assign({}, func(input).config)
             assert.deepEqual(actual, expected) 
          }
          cb()
     }
 }
+
 function allSnippetPossibilities(args){
     return Object.keys(args).map(key => ruleNegotiator({
         key, argDefinition: args[key], values: nonDerivedValues[key]
@@ -141,23 +149,24 @@ function allSnippetPossibilities(args){
 }
 
 describe('parser', _ => {
-    let snippetPossibilities = allSnippetPossibilities(argumentMap)
-    let defaultMap = buildDefault(argumentMap)
+    const snippetPossibilities = allSnippetPossibilities(argumentMap)
+    const defaultMap = buildDefault(argumentMap)
 
-    it('should parse a powerset', testAllAgainst(
+    it(`should parse a powerset ${logData}`, testAllAgainst(
         parseArgs,
         singlePowerSetGenerator(snippetPossibilities, defaultMap)
     ))
 
-    it('should parse all full option combinations', testAllAgainst(
+    it(`should parse all full option combinations ${logData}`, testAllAgainst(
         parseArgs,
         cartesianGenerator(snippetPossibilities, defaultMap)
     ))
 
     if(process.env.TEST_DEPTH == 'EXTREME'){
-        it('should parse the powerset of ALL option combinations', testAllAgainst(
+        console.log("TEST_DEPTH set to 'EXTREME': Generating expensive tests")
+        it(`should parse the powerset of ALL option combinations ${logData}`, testAllAgainst(
             parseArgs,
             fullPowerSetGenerator(snippetPossibilities, defaultMap)
-        ))
+        )).timeout(420000);
     }
 })
