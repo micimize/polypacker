@@ -1,5 +1,4 @@
 import fs from 'fs'
-import { taskWrapper, splitByContext, splitByEnv } from './utils'
 import { devServerRunner } from '../runners'
 import BundleTracker from 'webpack-bundle-tracker'
 
@@ -26,59 +25,47 @@ function handleIndexTemplate(){
     }
 }
 
-export function NODE_COMPONENT(args){
-    return taskWrapper([defaultContextualComponent(args)])
-}
-
-export function BROWSER_COMPONENT(args){
-    return taskWrapper([defaultContextualComponent(args)])
-}
-
 export function FULLSTACK_COMPONENT(args){
     handleIndexTemplate() // TODO: this and splitByContext don't handle args.out like they should
+
     args.contexts = ['NODE', 'BROWSER']
     args.environments = ['DEVELOPMENT', 'PRODUCTION']
-    var contexts = splitByContext(args)
-    var compilers = splitByEnv(contexts).map(defaultContextualComponent)
-    return taskWrapper(compilers, args.watch ? 'watch' : 'dist')
+    args.outPrefix = './dist/for/' 
+    args = fromSrcDir(args)
+    return args
 }
 
 export function NODE_APPLICATION(args){
-    args.context = 'NODE'
-    delete args.contexts
+    args.contexts = ['NODE']
     args.out = args.out || './dist/index.js'
     args.run = true
-    args = defaultContextualComponent(args)
-    args = splitByEnv(args)
-    return taskWrapper(args, args.watch ? 'watch-and-run' : 'run')
+    args = fromSrcDir(args)
+    return args
 }
 
 export function STANDALONE_BROWSER_APPLICATION(args){
-    args.runner = devServerRunner
-    args.context = 'BROWSER'
     args.bundle = true
-    args.run = args.watch && args.context
+    args.runner = devServerRunner
+
+    args.contexts = ['BROWSER']
+    args.run = args.watch && args.contexts.length
     args.hot = args.hot || args.watch
-    delete args.contexts
     args.out = args.out || './dist/index.js'
-    args = defaultContextualComponent(args)
-    let task = args.watch ? 'just-run' : 'dist'
-    args = splitByEnv(args)
-    return taskWrapper(args, task)
+    args = fromSrcDir(args)
+    return args
 }
 
 export function DJANGO_REACT(args){
     args.plugins = [new BundleTracker({filename: './webpack-stats.json'})]
+
     args.babelPresets = ['react']
     return STANDALONE_BROWSER_APPLICATION(args)
 }
 
 export function FULLSTACK_APPLICATION(args){
     args.contexts = ['NODE', 'BROWSER']
-    var contexts = splitByContext(args)
-    for (i = 0; i < contexts.length; i++) {
-        contexts[i] = defaultContextualComponent(contexts[i])
-        contexts[i].run = ( contexts[i].context == 'NODE' )
-    }
-    return taskWrapper(contexts, args.watch ? 'watch-and-run' : 'run')
+    args.run = 'NODE'
+    args.out = './dist/' 
+    args = fromSrcDir(args)
+    return args
 }

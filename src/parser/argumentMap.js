@@ -4,10 +4,17 @@ const argumentMap = {
         help: 'main entry point for your program, across all contexts'
     },
     out: {
-        help: 'destination for compiled bundle'
+        help: 'destination for compiled bundle. If there are multiple, , and the destination of specific bundles will be decided by the --combinator'
+    },
+    outCombinator: {
+        help: 'string to combine arguments that "define" a compiler (environment, environment)',
+        defaultValue: '_',
+    },
+    outPrefix: {
+        help: 'prefix for generated contextual modules. Appended to `out` directory',
     },
     modules: {
-        help: 'where to look for modules'
+        help: 'where to look for modules',
     },
     watch: {
         help: 'monitor source files for changes and recompile.',
@@ -17,9 +24,13 @@ const argumentMap = {
         help: 'enable hot module replacement',
         action: 'storeTrue'
     },
-    run: {
-        help: 'Which context to run on compilation, if any'
+    babelPreset: {
+        dest: 'babelPresets',
+        defaultValue: [],
+        help: 'add a preset to the babel loader, between es2015 and stage-0',
+        action: 'append'
     },
+
     env: {
         aliases: ['-e', '--environment'],
         dest: 'environments',
@@ -34,6 +45,7 @@ const argumentMap = {
         choices: ['NODE', 'BROWSER'],
         action: 'append'
     },
+
     preset: {
         help: '\
             reference to a preset build configuration. For instance, FULLSTACK_COMPONENT references {\
@@ -43,15 +55,19 @@ const argumentMap = {
             out: ./dist/for/$context_$env.js\
         }. Presets are actually functions that take in the given user args, and thus can have fairly intricate logic.',
     },
-    babelPreset: {
-        dest: 'babelPresets',
-        defaultValue: [],
-        help: 'add a preset to the babel loader, between es2015 and stage-0',
-        action: 'append'
+
+    task: {
+        help: 'the task to run. If non is specified, it will be inferred from other arguments.'
+    },
+    run: {
+        help: 'Which context to run on compilation, if any'
+    },
+    runner: {
+        help: 'Which runner to run the selected compiler with, if any'
     },
     logLevel: {
         defaultValue: 'ERROR',
-        choices: ['ERROR', 'VERBOSE'],
+        choices: ['ERROR', 'VERBOSE', 'NONE'],
         help: 'VERBOSE will output webpack stats and warnings'
     }
 }

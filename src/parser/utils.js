@@ -8,7 +8,9 @@ export function clone(obj) {
     return copy;
 }
 
-export function selectTask({watch, run}){
+export function selectTask({task, watch, run}){
+    if(task)
+        return task;
     if(watch && run){
         return 'watch-and-run'
     } else if(watch){
@@ -20,41 +22,21 @@ export function selectTask({watch, run}){
     }
 }
 
-export function taskWrapper(compilers, task, meta){
-    return {
-        task: task || 'dist', 
-        compilers: compilers,
-        meta: meta || {logLevel: compilers[0].logLevel || 'ERROR'}, 
-    }
-}
-
 export function flatten(arrays){
     return [].concat.apply([], arrays);
 }
 
-
-export function splitByContext(args){
-    if(Array.isArray(args)){
-        return flatten(args.map(splitByContext))
+export function splitter({plural, singular}){
+    return args => {
+        if(Array.isArray(args)){
+            return flatten(args.map(splitter(plural, singular)))
+        }
+        var vector = args[plural]
+        delete args[plural]
+        return vector && vector.length ? vector.map(function(element){
+            var newArgs = clone(args)
+            newArgs[singular] = element
+            return newArgs
+        }) : [args]
     }
-    var contexts = args.contexts
-    delete args.contexts
-    return contexts ? contexts.map(function(context){
-        var contextArgs = clone(args)
-        contextArgs.context = context
-        return contextArgs
-    }) : [args]
-}
-
-export function splitByEnv(args){
-    if(Array.isArray(args)){
-        return flatten(args.map(splitByEnv))
-    }
-    var envs = args.environments
-    delete args.environments
-    return envs ? envs.map(function(env){
-        var envArgs = clone(args)
-        envArgs.env = env
-        return envArgs
-    }) : [args]
 }

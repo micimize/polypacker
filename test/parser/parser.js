@@ -4,7 +4,17 @@ import { parseArgs } from '../../src/parser/parser'
 import argumentMap from '../../src/parser/argumentMap'
 import G from 'generatorics'
 
-var logData = ''
+const COVERAGE_LEVEL = {
+    'MINIMUM':   2000,
+    'MODERATE': 20000,
+    'EXTREME': 100000,
+    'MAXIMUM': 500000
+}
+const COVERAGE = {
+    NAME: process.env.COVERAGE_LEVEL || 'MINIMUM',
+    LEVEL: COVERAGE_LEVEL[process.env.COVERAGE_LEVEL || 'MINIMUM']
+}
+
 
 function combine(combination, defaultMap){
     return combination.reduce((test, {input, expected}) => ({
@@ -132,7 +142,6 @@ function testAllAgainst(func, generator){
             let { value: { input, expected} = {}, done } = generator.next()
             count += 1
             if(done){
-                logData = `[ ${count} variations ]`
                 break;
             }
             let actual = Object.assign({}, func(input).config)
@@ -152,21 +161,24 @@ describe('parser', _ => {
     const snippetPossibilities = allSnippetPossibilities(argumentMap)
     const defaultMap = buildDefault(argumentMap)
 
-    it(`should parse a powerset ${logData}`, testAllAgainst(
-        parseArgs,
-        singlePowerSetGenerator(snippetPossibilities, defaultMap)
-    ))
-
-    it(`should parse all full option combinations ${logData}`, testAllAgainst(
+    it('should parse all full option combinations', testAllAgainst(
         parseArgs,
         cartesianGenerator(snippetPossibilities, defaultMap)
     ))
 
-    if(process.env.TEST_DEPTH == 'EXTREME'){
-        console.log("TEST_DEPTH set to 'EXTREME': Generating expensive tests")
-        it(`should parse the powerset of ALL option combinations ${logData}`, testAllAgainst(
+    if(COVERAGE.LEVEL >= COVERAGE_LEVEL.MODERATE){
+        console.log(`COVERAGE_LEVEL set to ${COVERAGE.NAME}: Generating expensive tests`)
+        it('should parse a powerset', testAllAgainst(
+            parseArgs,
+            singlePowerSetGenerator(snippetPossibilities, defaultMap)
+        )).timeout(COVERAGE_LEVEL.MODERATE);
+    }
+
+    if(COVERAGE.LEVEL >= COVERAGE_LEVEL.MAXIMUM){
+
+        it('should parse the powerset of ALL option combinations', testAllAgainst(
             parseArgs,
             fullPowerSetGenerator(snippetPossibilities, defaultMap)
-        )).timeout(420000);
+        )).timeout(COVERAGE_LEVEL.MAXIMUM);
     }
 })

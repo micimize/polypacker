@@ -144,7 +144,7 @@ function exit({err} = {}){
     }
 }
 
-export default function runTask({config: {compilers, task}, unknown, callback = _=>_}){
+export default function runTask({config: {compilers, manager: {task, ...meta}}, unknown, callback = _=>_}){
     return tasks[task](compilers.map(sign), {unknown}).then(callback).catch(err => exit({err}))
 }
 

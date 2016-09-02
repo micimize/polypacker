@@ -1,0 +1,27 @@
+import fs from 'fs'
+import path from 'path'
+import { selectTask, splitter } from './utils'
+import { devServerRunner } from '../runners'
+
+function split(args){
+    return [
+        {singular: 'env', plural: 'environments'},
+        {singular: 'context', plural: 'contexts'},
+    ].reduce((args, map) => splitter(map)(args), args)
+}
+
+function combineOut({ combinator, outPrefix, ...args }){
+    if(args.context){
+        args.out = path.join(args.out || '', outPrefix || '', (
+            [args.context, args.env].reduce((combined, vector='') => combined + combinator + vector, '') + '.js'
+        ))
+    }
+    return args
+}
+
+export default function postProcess(args){
+    let  { task, run, runner, logLevel, ...compilerArgs } = args
+    task = task || selectTask(args)
+    let compilers = split(compilerArgs).map(combineOut)
+    return {compilers, manager: {task, run, runner, logLevel}}
+}
