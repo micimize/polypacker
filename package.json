@@ -6,8 +6,8 @@
   "bin": "./dist/cli.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dist": "./bootstrap.js --entry ./src/index.js --out ./dist/index.js --env PRODUCTION --context NODE",
-    "watch": "./bootstrap.js --entry ./src/index.js --out ./dist/index.js --env PRODUCTION --context NODE --watch"
+    "dist": "./bootstrap.js --entry ./src/index.js --out ./dist/index.js --environments PRODUCTION , --contexts NODE",
+    "watch": "./bootstrap.js --entry ./src/index.js --out ./dist/index.js --environments PRODUCTION , --contexts NODE , --watch"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
   "homepage": "https://github.com/michaeljosephrosenthal/polypacker#readme",
   "dependencies": {
     "argparse": "^1.0.7",
+    "jargon-parser": "^0.0.1",
     "babel-core": "^6.5.1",
     "babel-loader": "6.2.0",
     "babel-polyfill": "^6.8.0",
