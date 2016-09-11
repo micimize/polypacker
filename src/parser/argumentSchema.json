@@ -22,6 +22,10 @@
                     "help": "enable hot module replacement",
                     "type": "boolean"
                 },
+                "chunkFilename": {
+                    "help": "If provided, enables code splitting with webpack.require. Examples patterns include  '[id].chunk.js', '[name].chunk.js'",
+                    "type": "string"
+                },
 
                 "babelPresets": {
                     "type": "array",

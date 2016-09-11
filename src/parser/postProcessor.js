@@ -22,6 +22,8 @@ function combineOut({ combinator, outPrefix, ...args }){
 export default function postProcess(args){
     let  { task, run, runner, logLevel, ...compilerArgs } = args
     task = task || selectTask(args)
-    let compilers = split(compilerArgs).map(combineOut)
+    let compilers = split(compilerArgs)
+    if(compilers.length > 1)
+        compilers = compilers.map(combineOut);
     return {compilers, manager: {task, run, runner, logLevel}}
 }

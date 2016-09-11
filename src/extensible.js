@@ -3,7 +3,9 @@ import JSONPath from 'jsonpath-plus'
 import { merge } from './utils'
 
 function resolve(json, {path, resolver=_=>_}){
-    return resolver(JSONPath({json, path, flatten: true}))
+    return resolver(
+        Object.keys(
+            Object.assign({}, ...JSONPath({json, path, flatten: true}))))
 }
 
 function resolveSources(json, sources){

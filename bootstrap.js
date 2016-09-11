@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 require('babel-register')
 require('babel-polyfill')
-var taskManager = require('./src/taskManager').default
+var taskManager = require('./src/manager').default
 var argParser = require('./src/parser').default
 
 if (require.main === module) {

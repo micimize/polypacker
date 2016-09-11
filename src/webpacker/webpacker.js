@@ -9,7 +9,7 @@ import merge from 'webpack-merge'
 
 let builders = extend.byRequire({
     defaults: defaultBuilders,
-    path: 'webpackBuilders'
+    path: 'webpackConfiguration.Builders'
 })
 
 function buildConfig(args){

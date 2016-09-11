@@ -18,7 +18,7 @@ export function selectTask({task, watch, run}){
     } else if (run) {
         return 'run'
     } else {
-        return 'dist'
+        return 'compile'
     }
 }
 
@@ -29,7 +29,7 @@ export function flatten(arrays){
 export function splitter({plural, singular}){
     return args => {
         if(Array.isArray(args)){
-            return flatten(args.map(splitter(plural, singular)))
+            return flatten(args.map(splitter({plural, singular})))
         }
         var vector = args[plural]
         delete args[plural]

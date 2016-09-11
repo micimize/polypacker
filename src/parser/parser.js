@@ -1,6 +1,7 @@
 import applyPreset from './presets'
 import postProcess from './postProcessor'
 import schemaDrivenParser from 'jargon-parser'
+import schema from './argumentSchema.json'
 
 /*
 import parserFromArgumentMap from './parserFromArgumentMap'
@@ -20,7 +21,7 @@ const cli = parser({schema: __dirname + '/argumentSchema.json'})
 console.log(JSON.stringify(cli().options))
 */
 
-const parseArgs = schemaDrivenParser({schema: __dirname + '/argumentSchema.json'})
+const parseArgs = schemaDrivenParser({ schema })
 
 export default function parse(argstring){
     let {options, unknown} = parseArgs(argstring && argstring.trim().split(/ +/))
