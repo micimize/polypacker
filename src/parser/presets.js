@@ -5,16 +5,16 @@ function metaArgs(conf){
     return {logLevel: conf.logLevel}
 }
 
-let presetMap = extendbyRequire({
+export const presets = extendbyRequire({
     defaults: defaultPresetMap,
-    path: 'parserPresets'
+    path: 'parser.presets'
 })
 
 export default function apply(args){
     var preset = args.preset
     delete args.preset
-    if (preset && presetMap[preset]) {
-        return presetMap[preset](args)
+    if (preset && presets[preset]) {
+        return presets[preset](args)
     } else {
         return args
     }

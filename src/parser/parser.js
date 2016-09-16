@@ -1,7 +1,7 @@
 import applyPreset from './presets'
 import postProcess from './postProcessor'
 import schemaDrivenParser from 'jargon-parser'
-import argumentSchema from './argumentSchema.json'
+import defaultArgumentSchema from './argumentSchema.json'
 import * as extend from '../extensible'
 
 /*
@@ -24,18 +24,18 @@ console.log(JSON.stringify(cli().options))
 
 
 function mergeSchemas(base, subSchemas){
-    Object.assign(base.definitions, subSchemas)
-    base.allOf.push(Object.keys(subSchemas).map(module => ({ "$ref": `#/definitions/${module}` })))
+    Object.keys(subSchemas).forEach(
+        module => base.allOf.push({ "$ref": `#/definitions/${module}` }))
     return base
 }
 
-export const schema = extend.byRequireMap({
+export const argumentSchema = extend.byRequireMap({
     merger: mergeSchemas,
-    defaults: argumentSchema,
+    defaults: defaultArgumentSchema,
     path: 'parser.argumentSchema'
 })
 
-const parseArgs = schemaDrivenParser({ schema })
+const parseArgs = schemaDrivenParser({ schema: argumentSchema })
 
 export default function parse(argstring){
     let {options, unknown} = parseArgs(argstring && argstring.trim().split(/ +/))
