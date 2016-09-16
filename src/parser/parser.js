@@ -24,6 +24,7 @@ console.log(JSON.stringify(cli().options))
 
 
 function mergeSchemas(base, subSchemas){
+    Object.assign(base.definitions, subSchemas)
     Object.keys(subSchemas).forEach(
         module => base.allOf.push({ "$ref": `#/definitions/${module}` }))
     return base

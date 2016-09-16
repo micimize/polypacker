@@ -6,6 +6,9 @@ function metaArgs(conf){
 }
 
 export const presets = extendbyRequire({
+    merger(base, presets){
+        return Object.assign(base, ...presets)
+    },
     defaults: defaultPresetMap,
     path: 'parser.presets'
 })

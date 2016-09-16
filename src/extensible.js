@@ -45,7 +45,6 @@ export function byRequireMap({defaults, path, ...rest}){
             resolver(modules){
                 return modules.reduce((map, module) => {
                     map[module] = JSONPath({json: require(module), path, flatten: true})[0]
-                    console.log(map[module])
                     return map
                 }, {})
             }
