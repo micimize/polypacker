@@ -87,7 +87,7 @@ export default function autoLoader({
     return extensible({
         handler,
         sources: [
-            { path: '$.[dependencies,devDependencies]' },
+            { path: '$.[dependencies,devDependencies]', resolver: sources => sources.reduce((arr, map) => [...arr, ...Object.keys(map)], [])},
             {path: '$.polypacker.webpack.moduleLoaders', resolver: buildResolver(loaderSetMap)},
         ]
     })
