@@ -9,7 +9,7 @@ import merge from 'webpack-merge'
 
 let builders = extend.byRequire({
     defaults: defaultBuilders,
-    path: 'webpackBuilders'
+    path: 'webpackConfiguration.builders'
 })
 
 function buildConfig(args){
@@ -39,6 +39,7 @@ export default function webpacker({
     }
 
     let config = Object.assign( meta, merge.smart(buildConfig(args), overrides) )
+    if(context == 'BROWSER')
 
     return modify({config, env, hot: meta[identity].hot, bundle})
 }

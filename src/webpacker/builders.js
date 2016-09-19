@@ -43,14 +43,6 @@ export function target({context}){
     }
 }
 
-export function output(out){
-    return {
-        libraryTarget: "commonjs2",
-        path: path.dirname(out),
-        filename: path.basename(out),
-    }
-}
-
 export function fixed() {
     return {
         devtool: '#eval-cheap-source-map',
@@ -82,19 +74,25 @@ export function resolve({pwd, modules, dirname}) {
         },
     }
 }
-export function output({out}){
+
+
+function output({out, ...rest}){
     return {
         output:  {
-            libraryTarget: "commonjs2",
+          //libraryTarget: "commonjs2", TODO not sure why this was here, may be necessary for MODULE presets
             path: path.dirname(out),
             filename: path.basename(out),
+            ...rest
         }
     }
 }
 
-export function io({entry, out}){
-    return {entry: [ entry ], ...output({out})}
+
+export function io({entry, out, chunkFileName}){
+    let rest  = chunkFileName ? { chunkFileName } : {}
+    return {entry: [ entry ], ...output({out, ...rest})}
 }
+
 
 export function module({babelPresets, packagePath = './package.json'}){
     return {

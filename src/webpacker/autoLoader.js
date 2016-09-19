@@ -72,7 +72,7 @@ function buildResolver(loaderSetMap){
 }
 
 export default function autoLoader({
-    jsonPath = './package.json',
+    jsonPath = process.cwd() + '/package.json',
     loaderMap = defaultLoaderMap,
     loaderSetMap = defaultLoaderSetMap,
 } = {}){
@@ -81,14 +81,14 @@ export default function autoLoader({
         return loaders.filter(name => name.endsWith('-loader'))
             .map(name => name.replace(/-loader$/,''))
             .map(name => loaderMap[name])
-            .filter(name => name)
+            .filter(loader => typeof(loader) == 'object')
     }
 
     return extensible({
         handler,
         sources: [
-            {path: '$.[dependencies,devDependencies][?(@.endsWith("-loader"))]'},
-            {path: '$.polypacker.loaders', resolver: buildResolver(loaderSetMap)},
+            { path: '$.[dependencies,devDependencies]', resolver: sources => sources.reduce((arr, map) => [...arr, ...Object.keys(map)], [])},
+            {path: '$.polypacker.webpack.moduleLoaders', resolver: buildResolver(loaderSetMap)},
         ]
     })
 }

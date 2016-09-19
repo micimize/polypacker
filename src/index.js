@@ -1,4 +1,6 @@
 export configBuilder, { autoLoader } from './webpacker'
-export taskManager, { run } from './taskManager'
-export parser from './argparser'
+export taskManager from './manager'
+export parser from './parser'
 export { logCompilation } from './logging'
+
+export tasks, * as task from './tasks'

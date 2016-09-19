@@ -20,7 +20,7 @@ const nodemonRunner = {
         }).on('restart', () => {
             importantLog('Patched!')
         }).on('quit', () => {
-            importantLog(colors.cyan(configuration.context) + " process quit") 
+            importantLog(cyan(configuration.context) + " process quit") 
         })
     },
     restart(){
