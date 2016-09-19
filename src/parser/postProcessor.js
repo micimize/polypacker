@@ -10,10 +10,10 @@ function split(args){
     ].reduce((args, map) => splitter(map)(args), args)
 }
 
-function combineOut({ combinator, outPrefix, ...args }){
+function combineOut({ outCombinator: combinator, outPrefix, ...args }){
     if(args.context){
         args.out = path.join(args.out || '', outPrefix || '', (
-            [args.context, args.env].reduce((combined, vector='') => combined + combinator + vector, '') + '.js'
+            [args.context, args.env].reduce((combined, vector='') => (combined ? (combined + combinator) : '') + vector.toLowerCase(), '') + '.js'
         ))
     }
     return args

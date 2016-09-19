@@ -76,10 +76,10 @@ export function resolve({pwd, modules, dirname}) {
 }
 
 
-export function output({out, ...rest}){
+function output({out, ...rest}){
     return {
         output:  {
-            libraryTarget: "commonjs2",
+          //libraryTarget: "commonjs2", TODO not sure why this was here, may be necessary for MODULE presets
             path: path.dirname(out),
             filename: path.basename(out),
             ...rest

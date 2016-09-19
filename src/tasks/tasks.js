@@ -42,9 +42,9 @@ export const watchAll = watchTask({
     }
 })
 
-export async function runSelected(configurations, { unknown }){
+export async function runSelected(configurations, { unknown, run }){
   configurations.map(configuration => {
-      if(configuration.run){
+      if(configuration.context == run){
           let { runner = defaultRunner } = configuration
           runner.run({configuration, args: unknown})
       }

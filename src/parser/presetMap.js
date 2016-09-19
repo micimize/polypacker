@@ -64,7 +64,7 @@ export function DJANGO_REACT(args){
 
 export function FULLSTACK_APPLICATION(args){
     args.contexts = ['NODE', 'BROWSER']
-    args.run = 'NODE'
+    args.run = (args.watch || args.run) && 'NODE'
     args.out = './dist/' 
     args = fromSrcDir(args)
     return args

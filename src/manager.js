@@ -10,6 +10,6 @@ export default function runTask({config: { compilers, manager: { task, ...meta }
 
     ON_DEATH((signal, err) => exit({ err, task }))
 
-    return task(compilers, { unknown }).then( callback ).catch(err => exit({ err, task }))
+    return task(compilers, { unknown, ...meta }).then( callback ).catch(err => exit({ err, task }))
 }
 
