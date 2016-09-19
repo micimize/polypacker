@@ -1,6 +1,6 @@
 {
   "name": "polypacker",
-  "version": "0.2.0-alpha.1",
+  "version": "0.2.0-alpha.2",
   "description": "aims to provide context-driven code optimization and distribution for multiple environments",
   "main": "./dist/index.js",
   "bin": "./dist/cli.js",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/michaeljosephrosenthal/polypacker.git"
+    "url": "git+https://github.com/polypacker/polypacker.git"
   },
   "author": "Michael Joseph Rosenthal <rosenthalm93@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/michaeljosephrosenthal/polypacker/issues"
+    "url": "https://github.com/polypacker/polypacker/issues"
   },
-  "homepage": "https://github.com/michaeljosephrosenthal/polypacker#readme",
+  "homepage": "https://github.com/polypacker/polypacker#readme",
   "dependencies": {
     "babel-core": "^6.5.1",
     "babel-loader": "6.2.0",
@@ -30,7 +30,7 @@
     "colors": "^1.1.2",
     "death": "^1.0.0",
     "fs": "0.0.2",
-    "jargon-parser": "^0.0.1",
+    "jargon-parser": "^0.0.2",
     "json-loader": "^0.5.4",
     "jsonpath-plus": "^0.15.0",
     "nodemon": "^1.3.7",
@@ -39,7 +39,7 @@
     "read-json-sync": "^1.1.1",
     "source-map": "^0.5.3",
     "source-map-support": "^0.2.10",
-    "webpack": "^1.13.0",
+    "webpack": "1.13.0",
     "webpack-bundle-tracker": "0.0.93",
     "webpack-dev-server": "^1.14.1",
     "webpack-hot-middleware": "^2.10.0",
