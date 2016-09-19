@@ -1,13 +1,13 @@
 {
-    "polypacker": {
-        "parser": {
-            "argumentSchema": [ "simple-test-polypacker-plugin" ],
-            "presets": [ "simple-test-polypacker-plugin" ]
-        },
-        "tasks": [ "simple-test-polypacker-plugin" ],
-        "webpackConfiguration": {
-            "builders": [ "simple-test-polypacker-plugin" ],
-            "moduleLoaders": [ "simple-test-polypacker-plugin" ]
-        }
+  "polypacker": {
+    "parser": {
+      "argumentSchema": [ "simple-test-polypacker-plugin" ],
+      "presets": [ "simple-test-polypacker-plugin" ]
+    },
+    "tasks": [ "simple-test-polypacker-plugin" ],
+    "webpackConfiguration": {
+      "builders": [ "simple-test-polypacker-plugin" ],
+      "moduleLoaders": [ "simple-test-polypacker-plugin" ]
     }
+  }
 }

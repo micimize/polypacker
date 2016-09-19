@@ -7,77 +7,77 @@ import webpackConfig from '../webpacker'
 import { importantLog, logCompilation } from '../logging'
 
 function collapse({loader, query}){
-    return loader + "?" + JSON.stringify(query);
+  return loader + "?" + JSON.stringify(query);
 }
 
 function addOverrides(configuration, {host, port}){
-    let {
-        output: {
-            publicPath,
-            filename = '[name]-[hash].js',
-            libraryTarget,
-            path,
-            ...output
-        }
-    } = configuration
-    publicPath = `http://${host}:${port}${normalize(publicPath)}`
-    path = resolve(path),
-    configuration.output = { publicPath, filename, path, ...output }
-    configuration.node = {
-        __dirname: true,
-        fs: 'empty'
+  let {
+    output: {
+      publicPath,
+      filename = '[name]-[hash].js',
+      libraryTarget,
+      path,
+      ...output
     }
-    configuration.plugins.unshift(new webpack.HotModuleReplacementPlugin())
-    configuration.entry.unshift(`webpack-dev-server/client?http://${host}:${port}`)
-    configuration.entry.unshift('webpack/hot/only-dev-server')
+  } = configuration
+  publicPath = `http://${host}:${port}${normalize(publicPath)}`
+  path = resolve(path),
+  configuration.output = { publicPath, filename, path, ...output }
+  configuration.node = {
+    __dirname: true,
+    fs: 'empty'
+  }
+  configuration.plugins.unshift(new webpack.HotModuleReplacementPlugin())
+  configuration.entry.unshift(`webpack-dev-server/client?http://${host}:${port}`)
+  configuration.entry.unshift('webpack/hot/only-dev-server')
 
-    let {query, loader, ...rest} = configuration.module.loaders[0]
-    configuration.module.loaders[0] = {
-        ...rest,
-        loaders: [
-        'react-hot',
-        collapse({query, loader})
+  let {query, loader, ...rest} = configuration.module.loaders[0]
+  configuration.module.loaders[0] = {
+    ...rest,
+    loaders: [
+      'react-hot',
+      collapse({query, loader})
     ]}
 
-    configuration.externals = []
-    return configuration
+  configuration.externals = []
+  return configuration
 }
 
 const devServerRunner = {
-    logRun({configuration: {context, out}}){
-        importantLog(`serving ${cyan(context)} context from ${cyan(out)} with WebpackDevServer`)
-    },
-    run({configuration, args: {host='0.0.0.0', port=3000, ...args}}){
-        this.logRun({configuration})
-        this.config = addOverrides(webpackConfig(configuration), {host, port})
-        this.compiler = webpack(this.config)
-        this.server = new WebpackDevServer(this.compiler, {
-            publicPath: this.config.output.publicPath,
-            hot: true,
-            inline: true,
-            historyApiFallback: true,
+  logRun({configuration: {context, out}}){
+    importantLog(`serving ${cyan(context)} context from ${cyan(out)} with WebpackDevServer`)
+  },
+  run({configuration, args: {host='0.0.0.0', port=3000, ...args}}){
+    this.logRun({configuration})
+    this.config = addOverrides(webpackConfig(configuration), {host, port})
+    this.compiler = webpack(this.config)
+    this.server = new WebpackDevServer(this.compiler, {
+      publicPath: this.config.output.publicPath,
+      hot: true,
+      inline: true,
+      historyApiFallback: true,
 
-            quiet: false,
-            noInfo: false,
-            stats: {
-              // Config for minimal console.log mess.
-              assets: false,
-              colors: true,
-              version: false,
-              hash: false,
-              timings: false,
-              chunks: false,
-              chunkModules: false
-            }
-        })
-        this.server.listen(port, host, (err, result) => {
-            logCompilation
-            if (err) {
-                console.log(err);
-            }
-            console.log(`Listening at ${this.config.output.publicPath}`);
-        });
-    }
+      quiet: false,
+      noInfo: false,
+      stats: {
+        // Config for minimal console.log mess.
+        assets: false,
+        colors: true,
+        version: false,
+        hash: false,
+        timings: false,
+        chunks: false,
+        chunkModules: false
+      }
+    })
+    this.server.listen(port, host, (err, result) => {
+      logCompilation
+      if (err) {
+        console.log(err);
+      }
+      console.log(`Listening at ${this.config.output.publicPath}`);
+    });
+  }
 }
 
 export default devServerRunner

@@ -5,8 +5,8 @@ var taskManager = require('./src/manager').default
 var argParser = require('./src/parser').default
 
 if (require.main === module) {
-    process.stdout._handle.setBlocking(true);
-    process.stderr._handle.setBlocking(true);
-    taskManager(argParser())
+  process.stdout._handle.setBlocking(true);
+  process.stderr._handle.setBlocking(true);
+  taskManager(argParser())
 }
 

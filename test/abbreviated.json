@@ -1,6 +1,6 @@
 {
-    "polypacker": {
-        "plugins": [ "simple-test" ],
-        "tasks": [ ]
-    }
+  "polypacker": {
+    "plugins": [ "simple-test" ],
+    "tasks": [ ]
+  }
 }
