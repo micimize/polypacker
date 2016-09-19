@@ -75,11 +75,12 @@ export function resolve({pwd, modules, dirname}) {
   }
 }
 
-
-function output({out, ...rest}){
+function output({out, context, chunkFileName}){
+  let rest  = chunkFileName ? { chunkFileName } : {}
+  if(context == 'NODE')
+    rest.libraryTarget = "commonjs2";
   return {
     output:  {
-      //libraryTarget: "commonjs2", TODO not sure why this was here, may be necessary for MODULE presets
       path: path.dirname(out),
       filename: path.basename(out),
       ...rest
@@ -88,9 +89,8 @@ function output({out, ...rest}){
 }
 
 
-export function io({entry, out, chunkFileName}){
-  let rest  = chunkFileName ? { chunkFileName } : {}
-  return {entry: [ entry ], ...output({out, ...rest})}
+export function io({entry, out, chunkFileName, context}){
+  return {entry: [ entry ], ...output({out, context, chunkFileName})}
 }
 
 

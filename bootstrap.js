@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 require('babel-register')
 require('babel-polyfill')
-var taskManager = require('./src/manager').default
-var argParser = require('./src/parser').default
+
+var polypacker = require('./src/index')
+var taskManager = polypacker.taskManager
+var argParser = polypacker.parser
 
 if (require.main === module) {
   process.stdout._handle.setBlocking(true);

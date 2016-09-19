@@ -32,7 +32,7 @@ export function exit({ err, task } = {}){
     console.log(err)
     throw err
   }
-  if(task){
+  if(task && task.cleanUp){
     task.cleanUp((signal = 0) => {
       importantLog('Polypacker exited cleanly.')
       process.exit(0)
