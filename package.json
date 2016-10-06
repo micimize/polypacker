@@ -1,12 +1,13 @@
 {
   "name": "polypacker",
-  "version": "0.2.0-alpha.4",
+  "version": "0.2.0-alpha.5",
   "description": "aims to provide context-driven code optimization and distribution for multiple environments",
   "main": "./dist/index.js",
   "bin": "./dist/cli.js",
   "scripts": {
     "test": "mocha --compilers js:babel-core/register test/parser",
     "dist": "./bootstrap.js --entry ./src/index.js --out ./dist/index.js --environments PRODUCTION , --contexts NODE",
+    "prepublish": "npm run dist",
     "watch": "./bootstrap.js --entry ./src/index.js --out ./dist/index.js --environments DEVELOPMENT , --contexts NODE , --watch"
   },
   "repository": {
