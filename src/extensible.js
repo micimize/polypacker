@@ -23,6 +23,11 @@ export default function extensible({
   return merger(defaults, handler(resolveSources(json, sources)))
 }
 
+function subRequire({path}){
+  let subModule = module => JSONPath({json: module, path, flatten: true})[0]
+  return module => subModule($ES.requireExternal(module))
+}
+
 export function byRequire({defaults, path, ...rest}){
   return extensible({
     defaults,
@@ -30,24 +35,37 @@ export function byRequire({defaults, path, ...rest}){
     sources: [ {
       path: `$.polypacker.${path}`,
       resolver(modules){
-        return modules.map(module => JSONPath({json: require(module), path, flatten: true})[0])
+        return modules.map(subRequire({path}))
       }
     } ]
   })
 }
 
-export function byRequireMap({defaults, path, ...rest}){
+export function byRequireMap({ defaults, path, ...rest, options: { unpackContent = false, ...options } = {} }){
+
+  let subResolver = subRequire({path})
+
+  function moduleToKeyResolver(modules){
+    return modules.reduce((map, module) => {
+      map[module] = subResolver(module)
+      return map
+    }, {})
+  }
+
+  function unpackContentResolver(modules){
+    return modules.reduce((map, module) => {
+      Object.assign(map, subResolver(module))
+      return map
+    }, {})
+  }
+
   return extensible({
     defaults,
     ...rest,
     sources: [ {
       path: `$.polypacker.${path}`,
-      resolver(modules){
-        return modules.reduce((map, module) => {
-          map[module] = JSONPath({json: require(module), path, flatten: true})[0]
-          return map
-        }, {})
-      }
+      resolver: unpackContent ? unpackContentResolver : moduleToKeyResolver
     } ]
   })
 }
+

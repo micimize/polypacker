@@ -7,7 +7,19 @@ import * as extend from '../extensible'
 import * as defaultBuilders from './builders'
 import merge from 'webpack-merge'
 
-let builders = extend.byRequire({
+function chain(first, ...funcs){
+  return funcs.reduce((chained, func) => {
+    return arg => func(chained(arg))
+  }, first)
+}
+
+let builders = extend.byRequireMap({
+  handler(extensions){
+    return Object.keys(extensions).reduce((combined, key) => {
+      combined[key] = chain(...Object.values(extensions[key]))
+      return combined
+    }, {})
+  },
   defaults: defaultBuilders,
   path: 'webpackConfiguration.builders'
 })

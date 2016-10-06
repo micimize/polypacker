@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import webpack from 'webpack'
 import nodeExternals from 'webpack-node-externals'
-import autoLoader from './autoLoader'
+import loaders from './autoLoaders'
 
 function babelLoader({babelPresets}){
   babelPresets.unshift('es2015')
@@ -24,7 +24,8 @@ export function plugin({env, context, plugins}){
       new webpack.DefinePlugin({
         $ES: {
           CONTEXT: JSON.stringify(context || 'NODE'),
-          ENV: JSON.stringify(env)
+          ENV: JSON.stringify(env),
+          requireExternal: "function(mod){ return require(mod) }"
         }
       }),
       ...plugins,
@@ -94,12 +95,12 @@ export function io({entry, out, chunkFileName, context}){
 }
 
 
-export function module({babelPresets, packagePath = './package.json'}){
+export function module({ babelPresets }){
   return {
     module: {
       loaders: [
         babelLoader({babelPresets}), 
-        ...autoLoader({jsonPath: path.resolve(packagePath)}),
+        ...loaders,
       ]
     }
   }

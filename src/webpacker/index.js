@@ -1,2 +1,2 @@
 export default from './webpacker'
-export autoLoader from './autoLoader'
+export autoLoader from './autoLoaders'

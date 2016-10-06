@@ -11,14 +11,19 @@ const modifiers = {
           if(/^polypack!/.test(request)){
             return callback(null, `${request.substr(9)}/dist/for/${compound_version}`)
           }
+          if(/^external!/.test(request)){
+            return callback(null, `require${request.substr(9)}`)
+          }
           callback();
         }
       )
     }
     config.callbackLoader = {
-      polypack: (mod) => mod ?
-        `require("${mod}/dist/for/${compound_version}") //polypacked by dist` :
-        `require("./for/${compound_version}") //polypacked by dist`
+      polypack(mod){
+        return mod ?
+          `require("${mod}/dist/for/${compound_version}") //polypacked by dist` :
+          `require("./for/${compound_version}") //polypacked by dist`
+      }
     }
     return config
   },

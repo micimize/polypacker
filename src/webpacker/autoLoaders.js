@@ -1,4 +1,4 @@
-import extensible from '../extensible'
+import extensible, * as extend from '../extensible'
 
 function simpleTemplate({name, ...data}){
   return {
@@ -71,26 +71,42 @@ function buildResolver(loaderSetMap){
   }
 }
 
-export default function autoLoader({
-  jsonPath = process.cwd() + '/package.json',
-  loaderMap = defaultLoaderMap,
-  loaderSetMap = defaultLoaderSetMap,
-} = {}){
+const suffixes = /-(loader|polypacker-plugin)$/
 
-  function handler(loaders){
-    return loaders.filter(name => name.endsWith('-loader'))
-      .map(name => name.replace(/-loader$/,''))
-      .map(name => loaderMap[name])
-      .filter(loader => typeof(loader) == 'object')
-  }
-
-  return extensible({
-    handler,
-    sources: [
-      { path: '$.[dependencies,devDependencies]', resolver: sources => sources.reduce((arr, map) => [...arr, ...Object.keys(map)], [])},
-      {path: '$.polypacker.webpack.moduleLoaders', resolver: buildResolver(loaderSetMap)},
-    ]
-  })
+function stripSuffixes(str){
+  return str.replace(suffixes, "") 
 }
 
+function stripKeySuffixes(map){
+  return Object.keys(map).reduce((newMap, key) => {
+    newMap[stripSuffixes(key)] = map[key]
+    return newMap
+  }, {})
+}
 
+export const loaderMap = extend.byRequireMap({
+  handler: stripKeySuffixes,
+  defaults: defaultLoaderMap,
+  path: 'webpackConfiguration.moduleLoaders',
+  options: { unpackContent: true }
+})
+
+export const loaderSetMap = extend.byRequireMap({
+  handler: stripKeySuffixes,
+  defaults: defaultLoaderSetMap,
+  path: 'webpackConfiguration.moduleLoaderSets'
+})
+
+function handler(loaders){
+  return loaders.filter(name => name.match(suffixes))
+    .map(stripSuffixes)
+    .map(name => loaderMap[name])
+    .filter(loader => typeof(loader) == 'object')
+}
+
+export default extensible({
+  handler,
+  sources: [
+    { path: '$.[dependencies,devDependencies]', resolver: sources => sources.reduce((arr, map) => [...arr, ...Object.keys(map)], [])}
+  ]
+})

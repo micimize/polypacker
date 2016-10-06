@@ -7,7 +7,7 @@
   "scripts": {
     "test": "mocha --compilers js:babel-core/register test/parser",
     "dist": "./bootstrap.js --entry ./src/index.js --out ./dist/index.js --environments PRODUCTION , --contexts NODE",
-    "watch": "./bootstrap.js --entry ./src/index.js --out ./dist/index.js --environments PRODUCTION , --contexts NODE , --watch"
+    "watch": "./bootstrap.js --entry ./src/index.js --out ./dist/index.js --environments DEVELOPMENT , --contexts NODE , --watch"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,7 @@
     "callback-loader": "^0.2.4",
     "colors": "^1.1.2",
     "death": "^1.0.0",
+    "external-loader": "^0.1.1",
     "fs": "0.0.2",
     "jargon-parser": "^0.0.2",
     "json-loader": "^0.5.4",
