@@ -31,7 +31,6 @@
     "colors": "^1.1.2",
     "death": "^1.0.0",
     "external-loader": "^0.1.1",
-    "fs": "0.0.2",
     "jargon-parser": "^0.0.2",
     "json-loader": "^0.5.4",
     "jsonpath-plus": "^0.15.0",
