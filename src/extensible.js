@@ -1,5 +1,6 @@
 import readJsonSync from 'read-json-sync'
 import JSONPath from 'jsonpath-plus'
+import path from 'path'
 import { merge } from './utils'
 
 function resolve(json, {path, resolver=_=>_}){
@@ -23,9 +24,13 @@ export default function extensible({
   return merger(defaults, handler(resolveSources(json, sources)))
 }
 
+function localize(module){
+  // I only think this is necessary when using npm link
+  return path.join(process.env.PWD, module.startsWith('.') ? './' : './node_modules', module)
+}
 function subRequire({path}){
   let subModule = module => JSONPath({json: module, path, flatten: true})[0]
-  return module => subModule($ES.requireExternal(module))
+  return module => subModule($ES.requireExternal(process.env.POLYPACKER_LINKED ? localize(module) : module))
 }
 
 export function byRequire({defaults, path, ...rest}){

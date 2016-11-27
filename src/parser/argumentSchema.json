@@ -149,10 +149,14 @@
   },
   "type": "object",
   "allOf": [
-    { "$ref": "#/definitions/compilerArguments" },
-    { "$ref": "#/definitions/cartesianArguments" },
-    { "$ref": "#/definitions/managerArguments" },
+    {
+      "allOf": [
+        { "$ref": "#/definitions/compilerArguments" },
+        { "$ref": "#/definitions/cartesianArguments" }
+      ]
+    },
     { "$ref": "#/definitions/compilerList" },
+    { "$ref": "#/definitions/managerArguments" },
     { "$ref": "#/definitions/presets" }
   ]
 }

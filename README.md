@@ -40,7 +40,7 @@ or for an actual application, the currently clumsy looking:
 ```json
 {
   "scripts": {
-    "dist":  "polypacker --preset NODE_APPLICATION --babelPreset react --env PRODUCTION --run false",
+    "dist":  "polypacker --preset NODE_APPLICATION --babelPreset react --environments [ PRODUCTION ] --run false",
     "start": "polypacker --preset NODE_APPLICATION --babelPreset react --settings conf/settings.json"
   }
 }
@@ -72,7 +72,7 @@ So, for example, [`polypacker --preset FULLSTACK_COMPONENT --watch`](https://git
 {
     watch: true,
     contexts: ['NODE', 'BROWSER'],
-    environments: ['DEVELOPMENT', 'PRODUCTION']}
+    environments: ['DEVELOPMENT', 'PRODUCTION']
 }
 //=>
 [
@@ -81,49 +81,54 @@ So, for example, [`polypacker --preset FULLSTACK_COMPONENT --watch`](https://git
     { watch: true, context: 'BROWSER', env: 'DEVELOPMENT' },
     { watch: true, context: 'BROWSER', env: 'PRODUCTION'  }   
 ]
-```  
+```
 
 ## CLI Usage / Help
-This is the current output of `node node_modules/.bin/polypacker --help`:
+This is the current output of `node node_modules/.bin/polypacker --help`, :
 ```
-usage: polypacker [-h] [-v] [--entry ENTRY] [--out OUT] [--modules MODULES]
-              [--watch] [--hot] [--run RUN] [--env ENVIRONMENTS]
-              [--context CONTEXTS] [--preset PRESET]
-              [--babelPreset BABELPRESETS] [--logLevel LOGLEVEL]
-
-
-context-driven js distribution tool for multiple environments
-
-Optional arguments:
-  -h, --help            Show this help message and exit.
-  -v, --version         Show program's version number and exit.
-  --entry ENTRY         main entry point for your program, across all contexts
-  --out OUT             destination for compiled bundle
-  --modules MODULES     where to look for modules
-  --watch               monitor source files for changes and recompile.
-  --hot                 enable hot module replacement
-  --run RUN             Which context to run on compilation, if any
-  --env ENVIRONMENTS, -e ENVIRONMENTS, --environment ENVIRONMENTS
-                        an application lifecycle environment {DEVELOPMENT,
-                        PRODUCTION, etc} this distribution will run in. There
-                        can be multiple (each a seperate argument), and they
-                        will contribute to the cross product of compilers
-  --context CONTEXTS, -c CONTEXTS
-                        a context {NODE, BROWSER, etc} this distribution will
-                        run in. There can be multiple (each a seperate
-                        argument), and they will contribute to the cross
-                        product of compilers
-  --preset PRESET       reference to a preset build configuration. For
-                        instance, FULLSTACK_COMPONENT references { entry: .
-                        /src/entry.js contexts: [NODE, BROWSER] environments:
-                        [DEVELOPMENT, PRODUCTION] out: .
-                        /dist/for/$context_$env.js }. Presets are actually
-                        functions that take in the given user args, and thus
-                        can have fairly intricate logic.
-  --babelPreset BABELPRESETS
-                        add a preset to the babel loader, between es2015 and
-                        stage-0
-  --logLevel LOGLEVEL   VERBOSE will output webpack stats and warnings
+Usage: polypacker
+  --entry <string>                                   [optional]        # main entry point for your program, across all contexts
+  --out <string>                                     [optional]        # destination for compiled bundle. If there are multiple, the destination of specific bundles will be
+                                                                       decided by the --combinator
+  --watch <boolean>                                  [optional]        # monitor source files for changes and recompile.
+  --hot <boolean>                                    [optional]        # enable hot module replacement
+  --chunkFilename <string>                           [optional]        # If provided, enables code splitting with webpack.require. Examples patterns include  '[id].chunk.js',
+                                                                       '[name].chunk.js'
+  --babelPresets [ <string>, ...babelPresets ]       [required]        # add a preset to the babel loader, between es2015 and stage-0
+  --outCombinator <string>                           [default: "_"]    # string to combine arguments that "define" a compiler (environment, environment)
+  --outPrefix <string>                               [optional]        # prefix for generated contextual modules. Appended to `out` directory
+  --modules <string>                                 [optional]        # where to look for modules
+  --environments [ <string>, ...environments ]       [required]        # an application lifecycle environment {DEVELOPMENT, PRODUCTION, etc} this distribution will run in
+  --contexts [ <string>, ...contexts ]               [required]        # a context {NODE, BROWSER, etc} this distribution will run in.
+  --task <string>                                    [optional]        # the task to run. If non is specified, it will be inferred from other arguments.
+  --run <string>                                     [optional]        # Which context to run on compilation, if any
+  --runner <string>                                  [optional]        # Which runner to run the selected compiler with, if any
+  --logLevel <any>                                   [default: ERROR]  # VERBOSE will output webpack stats and warnings
+  --compilers [                                                        # List of simple compiler definitions, in case there are little or no shared compiler arguments.
+    [
+      --entry <string>                               [optional]        # main entry point for your program, across all contexts
+      --out <string>                                 [optional]        # destination for compiled bundle. If there are multiple, the destination of specific bundles will be
+                                                                       decided by the --combinator
+      --watch <boolean>                              [optional]        # monitor source files for changes and recompile.
+      --hot <boolean>                                [optional]        # enable hot module replacement
+      --chunkFilename <string>                       [optional]        # If provided, enables code splitting with webpack.require. Examples patterns include  '[id].chunk.js',
+                                                                       '[name].chunk.js'
+      --babelPresets [ <string>, ...babelPresets ]   [required]        # add a preset to the babel loader, between es2015 and stage-0
+      --outCombinator <string>                       [default: "_"]    # string to combine arguments that "define" a compiler (environment, environment)
+      --outPrefix <string>                           [optional]        # prefix for generated contextual modules. Appended to `out` directory
+      --modules <string>                             [optional]        # where to look for modules
+      --environment <string>                         [optional]        # an application lifecycle environment {DEVELOPMENT, PRODUCTION, etc} this distribution will run in.
+      --context <string>                             [optional]        # a context {NODE, BROWSER, etc} this distribution will run in.
+    ],
+    ...compilers
+  ]
+  --compilerPreset <string>                          [optional]        # Preset for compiler arguments, both simple and cartesian, applied before any other process
+  --managerPreset <string>                           [optional]        # Preset for manager arguments, applied after compilerPresets are run
+  --argumentPreset <string>                          [optional]        # combination of managerPreset and compilerPreset, runs after both are completed. If the given module
+                                                                       doesn't export an argumentPreset, it's compilerPreset and managerPresets will be used in succession instead.
+  --compilerListPreset <string>                      [optional]        # Preset for the compiler list, applied after the list has been generated
+  --postPreset <string>                              [optional]        # Preset applied after all parsing processes have run
+  --preset <string>                                  [optional]        # module from which to import ALL of the potential presets (any missing presets will be identities)
 ```
 
 ### configuration
