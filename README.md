@@ -27,7 +27,7 @@ and add something like the following to your `package.json`:
 }
 ```
 `npm run watch` will build development versions for both `NODE` and the `BROWSER`, and automatically run the `NODE` context by default:
-# img
+![example terminal output](https://cloud.githubusercontent.com/assets/8343799/20774555/793d7108-b71c-11e6-9fbd-c7295f459b99.png)
 It does this based on splitpoints in your code:
 ```javascript
     let server = ($ES.CONTEXT == 'NODE') ?
