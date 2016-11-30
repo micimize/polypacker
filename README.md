@@ -41,8 +41,6 @@ The global variable `$ES` (for ecmascript) that is injected with `DefinePlugin` 
         CONTEXT: ('NODE' || 'BROWSER')
     }
 ```
-### Examples
-* [fullstack react application with code splitting](https://github.com/polypacker/react-splitting-polypacker-example)
   
 ## Using polypacks
 Polypacks are fullstack components distributed with `polypacker --preset FULLSTACK_COMPONENT`. Loading polypacks from an application that is itself polypacked is quite straightforward:
@@ -58,6 +56,9 @@ From a normal `node.js` specific app that isn't polypacked, just reference the d
         process.NODE_ENV.toLowerCase() || 'development' \
     ).default
 ```
+## Examples
+* [fullstack react application with code splitting](https://github.com/polypacker/react-splitting-polypacker-example)
+* [self-rendering react router component](https://github.com/polypacker/example-react-router-polypack)
   
 ### configuration
 For customizing the webpack loaders, you can use the `polypacker.loaders` key in your `package.json`: 
