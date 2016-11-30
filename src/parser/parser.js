@@ -17,12 +17,19 @@ export const argumentSchema = extend.byRequireMap({
   path: 'parser.argumentSchema'
 })
 
-const parseArgs = schemaDrivenParser({ schema: argumentSchema })
+const parseArgs = schemaDrivenParser({
+  name: 'polypacker',
+  description: '\ncontext-driven js distribution tool for multiple environments\n',
+  schema: argumentSchema
+})
 
 export default function parse(argstring){
-  let {options, unknown} = parseArgs(argstring && argstring.trim().split(/ +/))
+  let options = Object.assign(
+    extend.byLiteral({ defaults: {}, path: 'arguments' }),
+    parseArgs(argstring && argstring.trim().split(/ +/))
+  )
   return {
     config: postProcess(applyPreset(options)),
-    unknown
+    unknown: {}
   }
 }

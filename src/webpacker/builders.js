@@ -5,13 +5,11 @@ import nodeExternals from 'webpack-node-externals'
 import loaders from './autoLoaders'
 
 function babelLoader({babelPresets}){
-  babelPresets.unshift('es2015')
-  babelPresets.push('stage-0')
   return {
     test: /\.js|\.jsx$/,
     loader: 'babel',
     query: {
-      presets: babelPresets.map(preset => `babel-preset-${preset}`)
+      presets: ['es2015', ...babelPresets, 'stage-0'].map(preset => `babel-preset-${preset}`)
     },
     exclude: /node_modules/,
     noParse: /\.min\.js/

@@ -30,7 +30,6 @@
         "babelPresets": {
           "type": "array",
           "items": { "type": "string" },
-          "default": [],
           "help": "add a preset to the babel loader, between es2015 and stage-0"
         },
 
@@ -149,10 +148,14 @@
   },
   "type": "object",
   "allOf": [
-    { "$ref": "#/definitions/compilerArguments" },
-    { "$ref": "#/definitions/cartesianArguments" },
-    { "$ref": "#/definitions/managerArguments" },
+    {
+      "allOf": [
+        { "$ref": "#/definitions/compilerArguments" },
+        { "$ref": "#/definitions/cartesianArguments" }
+      ]
+    },
     { "$ref": "#/definitions/compilerList" },
+    { "$ref": "#/definitions/managerArguments" },
     { "$ref": "#/definitions/presets" }
   ]
 }
