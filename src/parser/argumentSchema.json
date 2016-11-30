@@ -30,7 +30,6 @@
         "babelPresets": {
           "type": "array",
           "items": { "type": "string" },
-          "default": [],
           "help": "add a preset to the babel loader, between es2015 and stage-0"
         },
 

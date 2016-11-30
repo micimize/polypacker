@@ -10,7 +10,10 @@ function split(args){
   ].reduce((args, map) => splitter(map)(args), args)
 }
 
+const derivedEnv = process.env.NODE_ENV && process.env.NODE_ENV.toUpperCase() || 'DEVELOPMENT'
+
 function combineOut({ outCombinator: combinator, outPrefix, ...args }){
+  args.env = args.env || derivedEnv
   if(args.context){
     args.out = path.join(args.out || '', outPrefix || '', (
       [args.context, args.env].reduce((combined, vector='') => (combined ? (combined + combinator) : '') + vector.toLowerCase(), '') + '.js'
