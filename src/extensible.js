@@ -3,12 +3,16 @@ import JSONPath from 'jsonpath-plus'
 import path from 'path'
 import { merge } from './utils'
 
-function resolve(json, {path, resolver=_=>_}){
-  let modules = JSONPath({json, path, flatten: true})
-  return resolver(Array.isArray(modules) ? modules : Object.keys(modules))
+function defaultResolver(modules){
+  return Array.isArray(modules) ? modules : Object.keys(modules)
 }
 
-function resolveSources(json, sources){
+function resolve(json, {path, resolver = defaultResolver}){
+  let modules = JSONPath({json, path, flatten: true})
+  return resolver(modules)
+}
+
+function resolveSources({json, sources}){
   return merge(...sources.map(source => resolve(json, source)))
 }
 
@@ -21,7 +25,7 @@ export default function extensible({
   sources = [{path: process.env.CONFIGURATION_PATH || '$.polypacker'}]
 }){
   let json = readJsonSync(file)
-  return merger(defaults, handler(resolveSources(json, sources)))
+  return merger(defaults, handler(resolveSources({json, sources})))
 }
 
 function localize(module){
@@ -33,6 +37,17 @@ function subRequire({path}){
   return module => subModule($ES.requireExternal(process.env.POLYPACKER_LINKED ? localize(module) : module))
 }
 
+export function byLiteral({defaults, path, ...rest}){
+  return extensible({
+    defaults,
+    ...rest,
+    sources: [ {
+      path: `$.polypacker.${path}`,
+      resolver: _ => _[0]
+    } ]
+  })
+}
+
 export function byRequire({defaults, path, ...rest}){
   return extensible({
     defaults,
@@ -40,7 +55,7 @@ export function byRequire({defaults, path, ...rest}){
     sources: [ {
       path: `$.polypacker.${path}`,
       resolver(modules){
-        return modules.map(subRequire({path}))
+        return defaultResolver(modules).map(subRequire({path}))
       }
     } ]
   })
@@ -69,7 +84,9 @@ export function byRequireMap({ defaults, path, ...rest, options: { unpackContent
     ...rest,
     sources: [ {
       path: `$.polypacker.${path}`,
-      resolver: unpackContent ? unpackContentResolver : moduleToKeyResolver
+      resolver(modules){
+        return (unpackContent ? unpackContentResolver : moduleToKeyResolver)(defaultResolver(modules))
+      }
     } ]
   })
 }

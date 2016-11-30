@@ -24,7 +24,10 @@ const parseArgs = schemaDrivenParser({
 })
 
 export default function parse(argstring){
-  let options = parseArgs(argstring && argstring.trim().split(/ +/))
+  let options = Object.assign(
+    extend.byLiteral({ defaults: {}, path: 'arguments' }),
+    parseArgs(argstring && argstring.trim().split(/ +/))
+  )
   return {
     config: postProcess(applyPreset(options)),
     unknown: {}
