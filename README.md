@@ -5,8 +5,10 @@ You might consider using polypacker over vanilla webpack if:
 * You don't want to manage your own webpack configuration
 * You're building a universal javascript application or component
    
-
 Polypacker is inspired by [meteor isobuild](https://www.meteor.com/isobuild) and initially started as a fork of [jlongster/backend-with-webpack](https://github.com/jlongster/backend-with-webpack).
+  
+### Disclaimer
+Polypacker is still experimental and incomplete. Some familiar webpack features are currently lacking (HMR for one) but the goal for the project is ultimately to have parity.
   
 ## Quickstart
 `npm install --save-dev polypacker`  
@@ -60,23 +62,14 @@ From a normal `node.js` specific app that isn't polypacked, just reference the d
 * [fullstack react application with code splitting](https://github.com/polypacker/react-splitting-polypacker-example)
 * [self-rendering react router component](https://github.com/polypacker/example-react-router-polypack)
   
-### configuration
-For customizing the webpack loaders, you can use the `polypacker.loaders` key in your `package.json`: 
-```json
-  "polypacker": { "loaders": ["general-asset"] }
-```
-This feature is still nasceant, and will allow for customization in the future. For now, the options are the following:
-```javascript
-const defaultLoaderSetMap = {
-    'common-asset': ['woff', 'tff', 'eot', 'svg', 'png', 'jpg', 'png', 'eot', 'jpg'],
-    'web-asset': ['common-asset', 'json', 'html', 'css'],
-    'general-asset': ['web-asset', 'scss','less', 'sass', 'scss']
-}
-```
-To use this feature, the dependent project has to depend on the appropriate [underlying webpack loaders](https://github.com/michaeljosephrosenthal/polypacker/blob/master/src/webpacker/autoLoader.js#L26-L54), such as `url-loader`, or `file-loader`. In the future, these will be either automatically installed by `polypacker`, or specified as dependencies such as `polypack-general-asset-loader` that will pull in the underlying webpack loaders.
 ### Plugins
+Polypacker aims to be extensible at every step of execution via plugin, allowing plugins to add CLI arguments, webpack configuration builders, and task runners. While this feature is still nasceant, you can take a look at the [simple test plugin](https://github.com/polypacker/simple-test-polypacker-plugin/blob/master/src/index.js) for a survey of the current extension points, and the [typescript plugin](https://github.com/polypacker/typescript-polypacker-plugin/blob/master/src/index.js) to see a realworld example.  
+Plugins currently have to be referenced at each specific extension point in the `package.json` configuration, like so:
 ```json
   "polypacker": {
+    "arguments": {
+      "preset": "TYPESCRIPT"
+    },
     "parser": {
       "argumentSchema": "typescript-polypacker-plugin",
       "presets": "typescript-polypacker-plugin"
@@ -88,51 +81,35 @@ To use this feature, the dependent project has to depend on the appropriate [und
   }
 ```
   
-## CLI Usage / Help
-This is the current output of `node node_modules/.bin/polypacker --help`, written with [jargon-parser](https://github.com/polypacker/jargon-parser). It is currently very verbose:
+## Loaders
+Depended-upon webpack loaders will automatically be loaded, as long as there is a matching configuration in the [preconfigured webpack loaders](https://github.com/michaeljosephrosenthal/polypacker/blob/master/src/webpacker/autoLoader.js#L26-L54) or [plugins](https://github.com/polypacker/simple-test-polypacker-plugin/blob/master/src/index.js#L32).
+  
+### CLI Usage / Help
+This is the current output of `node node_modules/.bin/polypacker --help`, which . The CLI is built with [jargon-parser](https://github.com/polypacker/jargon-parser), which is nasceant and very verbose. It also thinks all array options are required, and doesn't have knowledge of the `preset` and `arguments` mechanisms.
 ```
+
 Usage: polypacker
-  --entry <string>                                   [optional]        # main entry point for your program, across all contexts
-  --out <string>                                     [optional]        # destination for compiled bundle. If there are multiple, the destination of specific bundles will be
-                                                                       decided by the --combinator
-  --watch <boolean>                                  [optional]        # monitor source files for changes and recompile.
-  --hot <boolean>                                    [optional]        # enable hot module replacement
-  --chunkFilename <string>                           [optional]        # If provided, enables code splitting with webpack.require. Examples patterns include  '[id].chunk.js',
-                                                                       '[name].chunk.js'
-  --babelPresets [ <string>, ...babelPresets ]       [required]        # add a preset to the babel loader, between es2015 and stage-0
-  --outCombinator <string>                           [default: "_"]    # string to combine arguments that "define" a compiler (environment, environment)
-  --outPrefix <string>                               [optional]        # prefix for generated contextual modules. Appended to `out` directory
-  --modules <string>                                 [optional]        # where to look for modules
-  --environments [ <string>, ...environments ]       [required]        # an application lifecycle environment {DEVELOPMENT, PRODUCTION, etc} this distribution will run in
-  --contexts [ <string>, ...contexts ]               [required]        # a context {NODE, BROWSER, etc} this distribution will run in.
-  --task <string>                                    [optional]        # the task to run. If non is specified, it will be inferred from other arguments.
-  --run <string>                                     [optional]        # Which context to run on compilation, if any
-  --runner <string>                                  [optional]        # Which runner to run the selected compiler with, if any
-  --logLevel <any>                                   [default: ERROR]  # VERBOSE will output webpack stats and warnings
-  --compilers [                                                        # List of simple compiler definitions, in case there are little or no shared compiler arguments.
-    [
-      --entry <string>                               [optional]        # main entry point for your program, across all contexts
-      --out <string>                                 [optional]        # destination for compiled bundle. If there are multiple, the destination of specific bundles will be
-                                                                       decided by the --combinator
-      --watch <boolean>                              [optional]        # monitor source files for changes and recompile.
-      --hot <boolean>                                [optional]        # enable hot module replacement
-      --chunkFilename <string>                       [optional]        # If provided, enables code splitting with webpack.require. Examples patterns include  '[id].chunk.js',
-                                                                       '[name].chunk.js'
-      --babelPresets [ <string>, ...babelPresets ]   [required]        # add a preset to the babel loader, between es2015 and stage-0
-      --outCombinator <string>                       [default: "_"]    # string to combine arguments that "define" a compiler (environment, environment)
-      --outPrefix <string>                           [optional]        # prefix for generated contextual modules. Appended to `out` directory
-      --modules <string>                             [optional]        # where to look for modules
-      --environment <string>                         [optional]        # an application lifecycle environment {DEVELOPMENT, PRODUCTION, etc} this distribution will run in.
-      --context <string>                             [optional]        # a context {NODE, BROWSER, etc} this distribution will run in.
-    ],
-    ...compilers
-  ]
-  --compilerPreset <string>                          [optional]        # Preset for compiler arguments, both simple and cartesian, applied before any other process
-  --managerPreset <string>                           [optional]        # Preset for manager arguments, applied after compilerPresets are run
-  --argumentPreset <string>                          [optional]        # combination of managerPreset and compilerPreset, runs after both are completed. If the given module
-                                                                       doesn't export an argumentPreset, it's compilerPreset and managerPresets will be used in succession instead.
-  --compilerListPreset <string>                      [optional]        # Preset for the compiler list, applied after the list has been generated
-  --postPreset <string>                              [optional]        # Preset applied after all parsing processes have run
-  --preset <string>                                  [optional]        # module from which to import ALL of the potential presets (any missing presets will be identities)
+
+context-driven js distribution tool for multiple environments
+
+Arguments:
+
+  --entry <string>                               [optional]        # main entry point for your program, across all contexts
+  --out <string>                                 [optional]        # destination for compiled bundle. If there are multiple, the destination of specific bundles will be decided by
+                                                                   the --combinator
+  --watch <boolean>                              [optional]        # monitor source files for changes and recompile.
+  --chunkFilename <string>                       [optional]        # If provided, enables code splitting with webpack.require. Examples patterns include  '[id].chunk.js',
+                                                                   '[name].chunk.js'
+  --babelPresets [ <string>, ...babelPresets ]   [required]        # add a preset to the babel loader, between es2015 and stage-0
+  --outCombinator <string>                       [default: "_"]    # string to combine arguments that "define" a compiler (environment, environment)
+  --outPrefix <string>                           [optional]        # prefix for generated contextual modules. Appended to `out` directory
+  --modules <string>                             [optional]        # where to look for modules
+  --environments [ <string>, ...environments ]   [required]        # an application lifecycle environment {DEVELOPMENT, PRODUCTION, etc} this distribution will run in
+  --contexts [ <string>, ...contexts ]           [required]        # a context {NODE, BROWSER, etc} this distribution will run in.
+  --task <string>                                [optional]        # the task to run. If non is specified, it will be inferred from other arguments.
+  --run <string>                                 [optional]        # Which context to run on compilation, if any
+  --runner <string>                              [optional]        # Which runner to run the selected compiler with, if any
+  --logLevel <any>                               [default: ERROR]  # VERBOSE will output webpack stats and warnings
+  --preset <string>                              [optional]        # module from which to import ALL of the potential presets (any missing presets will be identities)
 ```
 
