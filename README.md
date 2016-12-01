@@ -85,8 +85,9 @@ Plugins currently have to be referenced at each specific extension point in the 
 Depended-upon webpack loaders will automatically be loaded, as long as there is a matching configuration in the [preconfigured webpack loaders](https://github.com/michaeljosephrosenthal/polypacker/blob/master/src/webpacker/autoLoader.js#L26-L54) or [plugins](https://github.com/polypacker/simple-test-polypacker-plugin/blob/master/src/index.js#L32).
   
 ### CLI Usage / Help
-This is the current output of `node node_modules/.bin/polypacker --help`, which . The CLI is built with [jargon-parser](https://github.com/polypacker/jargon-parser), which is nasceant and very verbose. It also thinks all array options are required, and doesn't have knowledge of the `preset` and `arguments` mechanisms.
+The CLI is built with [jargon-parser](https://github.com/polypacker/jargon-parser), which is still nasceant. It is slightly inaccurate in that it thinks all array options are required, and doesn't have knowledge of the `preset` and `arguments` mechanisms.
 ```
+./node_modules/.bin/polypacker --help
 
 Usage: polypacker
 
