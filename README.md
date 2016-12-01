@@ -62,7 +62,7 @@ From a normal `node.js` specific app that isn't polypacked, just reference the d
 * [fullstack react application with code splitting](https://github.com/polypacker/react-splitting-polypacker-example)
 * [self-rendering react router component](https://github.com/polypacker/example-react-router-polypack)
   
-### Plugins
+## Plugins
 Polypacker aims to be extensible at every step of execution via plugin, allowing plugins to add CLI arguments, webpack configuration builders, and task runners. While this feature is still nasceant, you can take a look at the [simple test plugin](https://github.com/polypacker/simple-test-polypacker-plugin/blob/master/src/index.js) for a survey of the current extension points, and the [typescript plugin](https://github.com/polypacker/typescript-polypacker-plugin/blob/master/src/index.js) to see a realworld example.  
 Plugins currently have to be referenced at each specific extension point in the `package.json` configuration, like so:
 ```json
@@ -84,7 +84,7 @@ Plugins currently have to be referenced at each specific extension point in the 
 ## Loaders
 Depended-upon webpack loaders will automatically be loaded, as long as there is a matching configuration in the [preconfigured webpack loaders](https://github.com/michaeljosephrosenthal/polypacker/blob/master/src/webpacker/autoLoader.js#L26-L54) or [plugins](https://github.com/polypacker/simple-test-polypacker-plugin/blob/master/src/index.js#L32).
   
-### CLI Usage / Help
+## CLI Usage / Help
 The CLI is built with [jargon-parser](https://github.com/polypacker/jargon-parser), which is still nasceant. It is slightly inaccurate in that it thinks all array options are required, and doesn't have knowledge of the `preset` and `arguments` mechanisms.
 ```
 ./node_modules/.bin/polypacker --help
