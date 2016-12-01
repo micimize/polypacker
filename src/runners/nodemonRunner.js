@@ -13,12 +13,12 @@ const nodemonRunner = {
     return nodemon({
       execMap: { js: 'node' },
       script: path.join(process.env.PWD, configuration.out),
-      args,
-      ignore: ['*'],
-      watch: ['nothing/'],
-      ext: 'noop'
-    }).on('restart', () => {
-      importantLog('Patched!')
+      ...args,
+      watch: [configuration.out],
+    }).on('restart', (files) => {
+      importantLog(`restarted ${
+        cyan(files.map(f => path.relative(process.cwd(), f)).join(', '))
+      }`)
     }).on('quit', () => {
       importantLog(cyan(configuration.context) + " process quit") 
     })
