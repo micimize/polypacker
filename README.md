@@ -1,5 +1,5 @@
-# Polypacker 
-context-driven js distribution tool for multiple environments, built with webpack.  
+# Polypacker
+### Universal javascript build and distribution tool built on top of webpack 
 You might consider using polypacker over vanilla webpack if:
 * You dislike the fork and forget boilerplate pattern
 * You don't want to manage your own webpack configuration
