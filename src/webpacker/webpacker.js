@@ -43,6 +43,8 @@ export default function webpacker({
   process.chdir(process.env.PWD)
 
   let meta = polypackMeta ? {[identity]: polypackMeta} : sign({entry, out, hot, context, env})
+  if(context == 'BROWSER')
+    console.log('meta', meta);
 
   args = {
     entry, out, hot, bundle, modules, context, env, babelPresets, plugins,
@@ -51,5 +53,7 @@ export default function webpacker({
   }
 
   let config = Object.assign( meta, merge.smart(buildConfig(args), overrides) )
+  if(context == 'BROWSER')
+    console.log('config', config);
   return modify({config, env, hot: meta[identity].hot, bundle})
 }

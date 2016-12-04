@@ -34,11 +34,14 @@ export function plugin({env, context, plugins}){
 }
 
 export function target({context}){
-  return {
-    target: ({
-      NODE: 'node',
-      BROWSER: 'web'
-    })[context]
+  if(context == 'NODE'){
+    return {
+      target: 'node',
+      externals: [ nodeExternals() ]
+    }
+  }
+  else if (context == 'BROWSER'){
+    return { target: 'web' }
   }
 }
 
@@ -48,8 +51,7 @@ export function fixed() {
     node: {
       __dirname: false,
       __filename: false
-    },
-    externals: [ nodeExternals() ]
+    }
   }
 }
 
