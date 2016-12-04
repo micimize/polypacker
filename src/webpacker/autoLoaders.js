@@ -1,4 +1,5 @@
 import extensible, * as extend from '../extensible'
+import { flatten, uniquify, thread, merge } from '../utils'
 
 function simpleTemplate({name, ...data}){
   return {
@@ -22,15 +23,15 @@ export function expandSimpleLoaderMap(map){
   }, {})
 }
 
-const cssLoaders = [ 'style-loader', 'css-loader', 'postcss-loader' ]
+const cssLoaders = [ 'style-loader', 'css-loader' ]
 const defaultLoaderMap = Object.assign(
   expandSimpleLoaderMap({
     json: 'json-loader',
     html: 'html-loader',
-    css:  cssLoaders,
-    less: [ ...cssLoaders, 'less-loader'   ],
+    //css:  cssLoaders,
+    less: [ ...cssLoaders, 'postcss-loader', 'less-loader'   ],
   }), {
-    sass: { test: /\.sass$|\.scss$/, loaders: ["style-loader", "css-loader?sourceMap", "sass-loader?sourceMap"] },
+    sass: { test: /\.sass$|\.scss$/, loaders: ["style-loader", "css-loader", "sass-loader"] },
     woff: {
       test: /\.woff(2)?(\?.+)?$/,
       loader: "url-loader",
@@ -90,17 +91,37 @@ export const loaderMap = extend.byRequireMap({
   options: { unpackContent: true }
 })
 
+export const loaderDependencyMap = {
+  less: ['woff', 'tff', 'eot', 'svg', 'png', 'jpg', 'png', 'eot', 'jpg'],
+  sass: ['woff', 'tff', 'eot', 'svg', 'png', 'jpg', 'png', 'eot', 'jpg'],
+  scss: ['woff', 'tff', 'eot', 'svg', 'png', 'jpg', 'png', 'eot', 'jpg'],
+}
+
 export const loaderSetMap = extend.byRequireMap({
   handler: stripKeySuffixes,
   defaults: defaultLoaderSetMap,
   path: 'webpackConfiguration.moduleLoaderSets'
 })
 
+function getLoaderDefinitions(names){
+  return names.map(name => loaderMap[name]).filter(loader => typeof(loader) == 'object')
+}
+
+function handleDependencies(names){
+  return thread(names, [
+    names => names.map(name => loaderDependencyMap[name] || []),
+    flatten,
+    uniquify,
+    getLoaderDefinitions
+  ])
+}
+
 function handler(loaders){
-  return loaders.filter(name => name.match(suffixes))
-    .map(stripSuffixes)
-    .map(name => loaderMap[name])
-    .filter(loader => typeof(loader) == 'object')
+  const names = loaders.filter(name => name.match(suffixes)).map(stripSuffixes)
+  return flatten([
+    getLoaderDefinitions(names),
+    handleDependencies(names)
+  ])
 }
 
 export default extensible({

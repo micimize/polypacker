@@ -66,16 +66,20 @@ function values(obj){
 
 export function uniquify(list){
   let objects = []
-  return values(list.reduce((map, item) => {
-    if(typeof(item) != 'object'){
-      return Object.assign(map, {[item]: item})
-    } else if(!objects.filter(o => objectsAreEqual(o, item)).length){
+  list.forEach(item => {
+    if((
+        typeof(item) != 'object' && !objects.includes(item)
+      ) || (
+        !objects.filter(o => objectsAreEqual(o, item)).length)
+      ){
       objects.push(item)
-      return Object.assign(map, {[item]: item})
-    } else {
-      return map
     }
-  }, {}))
+  })
+  return objects
+}
+
+export function thread(value, functions){
+  return functions.reduce((value, f) => f.bind(this)(value), value)
 }
 
 function mergeArrays(arrays){
