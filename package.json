@@ -1,6 +1,6 @@
 {
   "name": "polypacker",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "aims to provide context-driven code optimization and distribution for multiple environments",
   "main": "./dist/index.js",
   "bin": "./dist/cli.js",
