@@ -30,7 +30,7 @@ const defaultLoaderMap = Object.assign(
     css:  cssLoaders,
     less: [ ...cssLoaders, 'less-loader'   ],
   }), {
-    sass: { test: /\.sass|\.scss$/, loader: "sass-loader" },
+    sass: { test: /\.sass$|\.scss$/, loaders: ["style-loader", "css-loader?sourceMap", "sass-loader?sourceMap"] },
     woff: {
       test: /\.woff(2)?(\?.+)?$/,
       loader: "url-loader",
