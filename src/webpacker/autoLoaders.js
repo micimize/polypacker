@@ -29,9 +29,8 @@ const defaultLoaderMap = Object.assign(
     html: 'html-loader',
     css:  cssLoaders,
     less: [ ...cssLoaders, 'less-loader'   ],
-    scss: [ 'sass-loader'   ],
-    sass: [ 'sass-loader'   ] 
   }), {
+    sass: { test: /\.sass|\.scss$/, loader: "sass-loader" },
     woff: {
       test: /\.woff(2)?(\?.+)?$/,
       loader: "url-loader",
