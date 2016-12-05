@@ -77,13 +77,19 @@ export function resolve({pwd, modules, dirname}) {
 }
 
 function output({out, context, chunkFilename, publicPath: explicitPublicPath }){
-  let rest  = chunkFilename ? { chunkFilename, publicPath: (explicitPublicPath || `/${path.dirname(path.normalize(out))}/`) } : {}
+  let filename = path.basename(out)
+  let rest = {}
+  if(chunkFilename)
+    rest = {
+      chunkFilename: `${path.parse(filename).name}.${chunkFilename}`,
+      publicPath: (explicitPublicPath || `/${path.dirname(path.normalize(out))}/`)
+    }
   if(context == 'NODE')
     rest.libraryTarget = "commonjs2";
   return {
     output:  {
       path: path.dirname(out),
-      filename: path.basename(out),
+      filename,
       ...rest
     }
   }
