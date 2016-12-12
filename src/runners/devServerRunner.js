@@ -20,7 +20,7 @@ function addOverrides(configuration, {host, port}){
       ...output
     }
   } = configuration
-  publicPath = `http://${host}:${port}${normalize(publicPath)}`
+  publicPath = /*`http://${host}:${port}`*/ normalize(publicPath)
   path = resolve(path),
   configuration.output = { publicPath, filename, path, ...output }
   configuration.node = {
@@ -28,17 +28,7 @@ function addOverrides(configuration, {host, port}){
     fs: 'empty'
   }
   configuration.plugins.unshift(new webpack.HotModuleReplacementPlugin())
-  configuration.entry.unshift(`webpack-dev-server/client?http://${host}:${port}`)
-  configuration.entry.unshift('webpack/hot/only-dev-server')
-
-  let {query, loader, ...rest} = configuration.module.loaders[0]
-  configuration.module.loaders[0] = {
-    ...rest,
-    loaders: [
-      'react-hot',
-      collapse({query, loader})
-    ]}
-
+  configuration.entry.unshift(`webpack-dev-server/client?http://${host}:${port}`, 'webpack/hot/dev-server')
   configuration.externals = []
   return configuration
 }
@@ -56,6 +46,7 @@ const devServerRunner = {
       hot: true,
       inline: true,
       historyApiFallback: true,
+      watchOptions: {poll: true},
 
       quiet: false,
       noInfo: false,
@@ -71,7 +62,7 @@ const devServerRunner = {
       }
     })
     this.server.listen(port, host, (err, result) => {
-      logCompilation
+      //logCompilation()
       if (err) {
         console.log(err);
       }

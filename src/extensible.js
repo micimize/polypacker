@@ -3,12 +3,27 @@ import JSONPath from 'jsonpath-plus'
 import path from 'path'
 import { merge } from './utils'
 
+function nestPaths({parents, child}){
+  if(!parents.length){
+    return child
+  }
+  child = `${parents.pop()}[(@['*']),${child}]`
+  return nestPaths({parents, child})
+}
+function expandPath(path){
+  let [anchor, root, ...parents] = path.split('.')
+  let child = parents.pop()
+  return nestPaths({parents: [`${anchor}.${root}`, ...parents], child})
+}
+
+const rootPath = process.env.CONFIGURATION_PATH || '$.polypacker'
+
 function defaultResolver(modules){
   return Array.isArray(modules) ? modules : Object.keys(modules)
 }
 
 function resolve(json, {path, resolver = defaultResolver}){
-  let modules = JSONPath({json, path, flatten: true})
+  let modules = JSONPath({json, path/*: expandPath(path)*/, flatten: true})
   return resolver(modules)
 }
 
@@ -22,7 +37,7 @@ export default function extensible({
   merger = merge,
   resolver = _ => _,
   file = process.env.CONFIGURATION_FILE || './package.json',
-  sources = [{path: process.env.CONFIGURATION_PATH || '$.polypacker'}]
+  sources = [{path: rootPath}]
 }){
   let json = readJsonSync(file)
   return merger(defaults, handler(resolveSources({json, sources})))
