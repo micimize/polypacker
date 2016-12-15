@@ -10,7 +10,7 @@ export const presets = extendbyRequire({
     return Object.assign(base, ...presets)
   },
   defaults: defaultPresetMap,
-  path: 'parser.presets'
+  path: ['parser', 'presets']
 })
 
 export default function apply(args){

@@ -14,7 +14,7 @@ function mergeSchemas(base, subSchemas){
 export const argumentSchema = extend.byRequireMap({
   merger: mergeSchemas,
   defaults: defaultArgumentSchema,
-  path: 'parser.argumentSchema'
+  path: ['parser', 'argumentSchema']
 })
 
 const parseArgs = schemaDrivenParser({
@@ -25,7 +25,7 @@ const parseArgs = schemaDrivenParser({
 
 export default function parse(argstring){
   let options = Object.assign(
-    extend.byLiteral({ defaults: {}, path: 'arguments' }),
+    extend.byLiteral({ defaults: {}, path: ['arguments'] }),
     parseArgs(argstring && argstring.trim().split(/ +/))
   )
   return {
