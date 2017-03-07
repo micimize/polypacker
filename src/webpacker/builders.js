@@ -29,6 +29,9 @@ export function plugin({env, context, plugins}){
       ...plugins,
       new webpack.optimize.OccurenceOrderPlugin(),
       new webpack.NoErrorsPlugin(),
+      ...(context == 'NODE' ?
+        [new webpack.BannerPlugin('require("source-map-support").install();', { raw: true, entryOnly: false })] :
+        [])
     ]
   }
 }
@@ -47,7 +50,7 @@ export function target({context}){
 
 export function fixed() {
   return {
-    devtool: '#eval-cheap-source-map',
+    devtool: '#source-map',
     node: {
       __dirname: false,
       __filename: false
