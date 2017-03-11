@@ -1,6 +1,6 @@
 import identity from '../identity'
 import { onBuild, polypack } from './utils'
-import { log, importantLog, logImportantFromToAction, logCompilation } from '../logging'
+import { log, importantLog, logImportantFromToAction } from '../logging'
 
 export function watchTask({ onWatch }){
   function watch(configurations){

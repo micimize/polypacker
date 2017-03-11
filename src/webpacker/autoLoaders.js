@@ -87,7 +87,7 @@ function stripKeySuffixes(map){
 export const loaderMap = extend.byRequireMap({
   handler: stripKeySuffixes,
   defaults: defaultLoaderMap,
-  path: 'webpackConfiguration.moduleLoaders',
+  path: ['webpackConfiguration', 'moduleLoaders'],
   options: { unpackContent: true }
 })
 
@@ -100,7 +100,7 @@ export const loaderDependencyMap = {
 export const loaderSetMap = extend.byRequireMap({
   handler: stripKeySuffixes,
   defaults: defaultLoaderSetMap,
-  path: 'webpackConfiguration.moduleLoaderSets'
+  path: ['webpackConfiguration', 'moduleLoaderSets']
 })
 
 function getLoaderDefinitions(names){
@@ -127,6 +127,6 @@ function handler(loaders){
 export default extensible({
   handler,
   sources: [
-    { path: '$.[dependencies,devDependencies]', resolver: sources => sources.reduce((arr, map) => [...arr, ...Object.keys(map)], [])}
+    { path: [{'allOf': ['dependencies','devDependencies']}], resolver: sources => sources.reduce((arr, map) => [...arr, ...Object.keys(map)], [])}
   ]
 })

@@ -51,6 +51,7 @@ export function STANDALONE_BROWSER_APPLICATION(args){
   args.run = args.watch && args.contexts.length && args.contexts[0]
   args.hot = args.hot || args.watch
   args.out = args.out || './dist/index.js'
+  delete args.watch
   args = fromSrcDir(args)
   return args
 }

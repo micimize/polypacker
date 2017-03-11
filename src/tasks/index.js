@@ -14,7 +14,7 @@ export default extendbyRequire({
     'run': chain(compileAll, runSelected),
     'watch-and-run': chain(watchAll, runSelected)
   },
-  path: 'tasks'
+  path: ['tasks']
 })
 
 export { utils, builders }

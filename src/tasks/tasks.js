@@ -4,7 +4,7 @@ import identity, { sign } from '../identity'
 import { onBuild, polypack } from './utils'
 import { watchTask } from './builders'
 
-import { log, importantLog, logImportantFromToAction, logCompilation } from '../logging'
+import { log, importantLog, logImportantFromToAction } from '../logging'
 
 export function compileAll(configurations){
   let waiting = configurations.length

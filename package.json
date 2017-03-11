@@ -1,6 +1,6 @@
 {
   "name": "polypacker",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "aims to provide context-driven code optimization and distribution for multiple environments",
   "main": "./dist/index.js",
   "bin": "./dist/cli.js",
@@ -34,7 +34,6 @@
     "file-loader": "^0.9.0",
     "jargon-parser": "^0.1.2",
     "json-loader": "^0.5.4",
-    "jsonpath-plus": "^0.15.0",
     "nodemon": "^1.11.0",
     "orchestrator": "^0.3.7",
     "react-hot-loader": "^1.3.0",
