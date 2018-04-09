@@ -1,4 +1,4 @@
-# Polypacker
+# Polypacker (currently unmaintained)
 ### Universal javascript build and distribution tool built on top of webpack 
 You might consider using polypacker over vanilla webpack if:
 * You dislike the fork and forget boilerplate pattern
